@@ -202,6 +202,82 @@ p strong{color:#fff;font-weight:650}
 .qr img{width:27rem;height:27rem;display:block}
 .qr .unter{font-size:1.7rem;font-weight:650;color:var(--tinte);margin-top:1.4rem}
 
+/* ================= Varianten =================
+   Gleicher Stil, aber nicht jede Folie "Text links, Kasten rechts" (Wunsch Nils 15.10.).
+   Keine Flex-gaps (aeltere Samsung-Browser), Grid-gaps sind in Ordnung. */
+
+/* Gespiegelt: Bild oder Kasten links, Text rechts */
+.folie.v-gespiegelt{grid-template-columns:1fr 1.12fr}
+.folie.v-gespiegelt > :first-child{-webkit-box-ordinal-group:3;order:2}
+
+/* Foto ueber die ganze Flaeche, Text auf dunklem Verlauf */
+.v-foto .hintergrund{position:absolute;top:0;left:0;right:0;bottom:-7.2rem;z-index:0;overflow:hidden}
+.v-foto .hintergrund img{width:100%;height:100%;object-fit:cover;display:block}
+.v-foto .hintergrund:after{content:"";position:absolute;top:0;left:0;right:0;bottom:0;
+  background:linear-gradient(90deg, rgba(13,17,48,.97) 0%, rgba(13,17,48,.9) 40%, rgba(13,17,48,.35) 70%, rgba(13,17,48,.1) 100%)}
+.v-foto > div:not(.hintergrund){position:relative;z-index:1}
+.v-foto.v-gespiegelt > :first-child{order:0}
+.v-foto.v-gespiegelt > div:not(.hintergrund){grid-column:2}
+.v-foto.v-gespiegelt .hintergrund:after{background:linear-gradient(270deg, rgba(13,17,48,.97) 0%, rgba(13,17,48,.9) 42%, rgba(13,17,48,.35) 72%, rgba(13,17,48,.1) 100%)}
+
+/* Farbblock: hellblaue Flaeche links bis an den Rand, darin die Kennzahl */
+.folie.v-panel{grid-template-columns:.95fr 1.05fr;padding-left:0}
+.v-panel > .panel{-webkit-box-ordinal-group:0;order:-1;align-self:stretch;margin:-4.2rem 0 -2.6rem 0;padding:4rem 4rem 4rem 5.5rem;
+  background:var(--hellblau);display:-webkit-box;display:flex;-webkit-box-orient:vertical;flex-direction:column;justify-content:center}
+.panel .zahl b{color:var(--grund);font-size:10.5rem}
+.panel .zahl span{color:var(--grund);font-weight:600}
+.panel .merke{color:rgba(15,20,56,.85);border-top-color:rgba(15,20,56,.25)}
+.panel .merke strong{color:var(--grund)}
+.panel.karte{border:0;border-radius:0}
+.panel .preise-titel{color:var(--grund)}
+.panel .balken .b-kopf{color:rgba(15,20,56,.85)}
+.panel .balken .b-kopf b{color:var(--grund)}
+.panel .balken i{background:var(--grund)}
+
+/* Schritte in einer Reihe: Text oben, drei grosse Karten darunter */
+.folie.v-reihe{display:-webkit-box;display:flex;-webkit-box-orient:vertical;flex-direction:column;justify-content:center;grid-gap:0;gap:0}
+.v-reihe > div:first-child{display:grid;grid-template-columns:1.25fr 1fr;grid-column-gap:4.5rem;align-items:end;margin-bottom:3.2rem}
+.v-reihe > div:first-child > .dach,.v-reihe > div:first-child > h2{grid-column:1 / -1}
+.v-reihe > div:first-child > p{margin:0}
+.v-reihe > div:first-child > .fehler{margin:0}
+.v-reihe .schritte{display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));grid-gap:1.8rem}
+.v-reihe .schritte li{margin:0;padding:7rem 2.2rem 2.2rem;font-size:2rem;min-height:17rem}
+.v-reihe .schritte li:before{top:2rem;left:2.2rem;margin-top:0;width:4.2rem;height:4.2rem;line-height:4.2rem;font-size:2.1rem}
+.v-reihe .schritte li small{font-size:1.45rem;margin-top:.6rem}
+
+/* Zeitstrahl: Text oben, Termine waagerecht */
+.folie.v-zeitstrahl{display:-webkit-box;display:flex;-webkit-box-orient:vertical;flex-direction:column;justify-content:center;grid-gap:0;gap:0}
+.v-zeitstrahl .oben{display:grid;grid-template-columns:1.1fr 1fr;grid-column-gap:4.5rem;align-items:end;margin-bottom:4.5rem}
+.v-zeitstrahl .oben p{margin:0 0 1.6rem}
+.strahl{position:relative;display:grid;grid-template-columns:repeat(7, minmax(0, 1fr));padding-top:3.4rem}
+.strahl:before{content:"";position:absolute;top:1.05rem;left:7.14%;right:7.14%;height:2px;background:var(--linie)}
+.punkt{position:relative;text-align:center;padding:0 .6rem}
+.punkt:before{content:"";position:absolute;top:-3.2rem;left:50%;margin-left:-1rem;width:2rem;height:2rem;border-radius:50%;
+  background:var(--grund);border:3px solid var(--hellblau);box-sizing:border-box}
+.punkt.st:before{background:var(--hellblau)}
+.punkt.ziel:before{background:var(--hell);border-color:var(--hell)}
+.punkt em{display:block;font-style:normal;font-size:1.2rem;font-weight:650;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3)}
+.punkt b{display:block;font-size:1.65rem;font-weight:650;color:#fff;margin-top:.4rem;line-height:1.2}
+.punkt span{display:block;font-size:1.3rem;color:var(--text-2);margin-top:.2rem}
+
+/* Datumsblock (Offener Samstag) */
+.datum-block{display:-webkit-inline-box;display:inline-flex;align-items:center;background:var(--hellblau);color:var(--grund);
+  border-radius:1.4rem;padding:1.2rem 2.2rem 1.2rem 1.8rem;margin-bottom:2.2rem}
+.datum-block b{font-size:6.8rem;font-weight:800;line-height:.9;letter-spacing:-.03em;margin-right:1.4rem}
+.datum-block span{display:block;font-size:2.1rem;font-weight:720;line-height:1.15}
+.datum-block em{display:block;font-style:normal;font-size:1.25rem;font-weight:650;letter-spacing:.08em;text-transform:uppercase;margin-top:.35rem}
+
+/* Helle Folie (Rezepte): heller Grund, Zutaten dunkel abgesetzt */
+.folie.v-hell{background:linear-gradient(160deg, #f1f4fd 0%, #dfe6f8 100%)}
+.v-hell .dach{color:var(--indigo)}
+.v-hell h2{color:var(--grund)}
+.v-hell p{color:#3b4272}
+.v-hell .quelle{color:#6b7199}
+.v-hell .meta span{background:#fff;border-color:rgba(61,75,167,.22);color:var(--grund)}
+.v-hell .karte.hell{background:var(--indigo);color:#fff;box-shadow:0 2rem 4rem rgba(29,36,96,.25)}
+.v-hell .zutaten li{color:#fff;border-top-color:rgba(255,255,255,.16)}
+.v-hell .zutaten li b{color:#c9dbff}
+
 /* ---------- Fusszeile ---------- */
 .fuss{position:fixed;left:0;right:0;bottom:0;height:7.2rem;display:-webkit-box;display:flex;align-items:center;justify-content:space-between;
   padding:0 5.5rem;border-top:1px solid var(--linie);background:rgba(10,13,40,.55)}
@@ -256,7 +332,7 @@ p strong{color:#fff;font-weight:650}
      "Ersttestung am Samstag umsonst" bzw. Gratis-Gutscheine (Vault, Offener-Samstag-2026). -->
 <section class="folie" data-id="samstag" data-bis="2026-11-28T13:00">
   <div>
-    <div class="dach ein">Samstag, 28. November · 10 bis 13 Uhr</div>
+    <div class="datum-block ein"><b>28</b><div><span>November</span><em>Samstag · 10 bis 13 Uhr</em></div></div>
     <h2 class="ein" style="--d:1">Offener Samstag</h2>
     <div class="akzent ein" style="--d:2">Bringen Sie jemanden mit.</div>
     <p class="ein" style="--d:3">Partner, Eltern, Nachbarn oder Freunde können an diesem Vormittag einfach vorbeikommen und sehen, wie Sie hier trainieren.</p>
@@ -288,30 +364,31 @@ p strong{color:#fff;font-weight:650}
 </section>
 
 <!-- ============ 3-MONATS-AUFBAUPROGRAMM ============ -->
-<section class="folie" data-id="aufbauprogramm">
-  <div>
-    <div class="dach ein">3-Monats-Aufbauprogramm</div>
-    <h2 class="ein" style="--d:1">Zwölf Wochen mit festem Plan</h2>
-    <div class="akzent ein" style="--d:2">Begleitet einsteigen, ohne lange Bindung.</div>
-    <p class="ein" style="--d:3">Sieben feste Termine, dazwischen trainieren Sie zweimal pro Woche, wann es Ihnen passt. Alle Kurse sind inklusive. Nach drei Monaten endet das Programm von selbst, eine Kündigung ist nicht nötig.</p>
-    <div class="ein" style="--d:4"><span class="stempel">349&nbsp;€ einmalig</span><span class="klein">keine Startgebühr</span></div>
-  </div>
-  <div class="karte ein" style="--d:2">
-    <div class="preise-titel">Ihre sieben Termine</div>
-    <div class="leiste">
-      <div><em>Woche 0</em>Ersttestung</div>
-      <div class="st"><em>Woche 1</em>Sporttherapie<span>60 Min.</span></div>
-      <div><em>Woche 4</em>Check-up</div>
-      <div class="st"><em>Woche 5</em>Sporttherapie<span>60 Min.</span></div>
-      <div><em>Woche 8</em>Check-up</div>
-      <div class="st"><em>Woche 9</em>Sporttherapie<span>60 Min.</span></div>
-      <div class="ziel"><em>Woche 12</em>Abschluss-Check-up</div>
+<section class="folie v-zeitstrahl" data-id="aufbauprogramm">
+  <div class="oben">
+    <div>
+      <div class="dach ein">3-Monats-Aufbauprogramm</div>
+      <h2 class="ein" style="--d:1">Zwölf Wochen mit festem Plan</h2>
+      <div class="akzent ein" style="--d:2;margin:0">Begleitet einsteigen, ohne lange Bindung.</div>
     </div>
+    <div>
+      <p class="ein" style="--d:3">Sieben feste Termine, dazwischen trainieren Sie zweimal pro Woche, wann es Ihnen passt. Alle Kurse sind inklusive. Nach drei Monaten endet das Programm von selbst, eine Kündigung ist nicht nötig.</p>
+      <div class="ein" style="--d:4"><span class="stempel">349&nbsp;€ einmalig</span><span class="klein">keine Startgebühr</span></div>
+    </div>
+  </div>
+  <div class="strahl ein" style="--d:3">
+    <div class="punkt"><em>Woche 0</em><b>Ersttestung</b></div>
+    <div class="punkt st"><em>Woche 1</em><b>Sport&shy;therapie</b><span>60 Min.</span></div>
+    <div class="punkt"><em>Woche 4</em><b>Check-up</b></div>
+    <div class="punkt st"><em>Woche 5</em><b>Sport&shy;therapie</b><span>60 Min.</span></div>
+    <div class="punkt"><em>Woche 8</em><b>Check-up</b></div>
+    <div class="punkt st"><em>Woche 9</em><b>Sport&shy;therapie</b><span>60 Min.</span></div>
+    <div class="punkt ziel"><em>Woche 12</em><b>Abschluss-Check-up</b><span>mit Vergleich zu Woche 0</span></div>
   </div>
 </section>
 
 <!-- ============ CHECK-UP ============ -->
-<section class="folie" data-id="checkup">
+<section class="folie v-gespiegelt" data-id="checkup">
   <div>
     <div class="dach ein">Check-up</div>
     <h2 class="ein" style="--d:1">Was hat sich seit der Ersttestung getan?</h2>
@@ -330,7 +407,7 @@ p strong{color:#fff;font-weight:650}
 </section>
 
 <!-- ============ SPORTTHERAPIE-SITZUNGEN ============ -->
-<section class="folie" data-id="sporttherapie">
+<section class="folie v-gespiegelt" data-id="sporttherapie">
   <div>
     <div class="dach ein">Sporttherapie</div>
     <h2 class="ein mittel" style="--d:1">Einzelsitzung mit einem Sporttherapeuten</h2>
@@ -346,7 +423,7 @@ p strong{color:#fff;font-weight:650}
 </section>
 
 <!-- ============ SQUASH ============ -->
-<section class="folie" data-id="squash">
+<section class="folie v-foto" data-id="squash">
   <div>
     <div class="dach ein">Squash</div>
     <h2 class="ein" style="--d:1">Lust auf eine Runde Squash?</h2>
@@ -359,11 +436,11 @@ p strong{color:#fff;font-weight:650}
     </table>
     <div class="quelle ein" style="--d:4;font-size:1.4rem;color:var(--text-2)">Mit Wellpass: ein Check-in für 30 Minuten Spielzeit.</div>
   </div>
-  <div class="foto ein" style="--d:2"><img src="bilder/squash-court.jpg" alt=""></div>
+  <div class="hintergrund"><img src="bilder/squash-court.jpg" alt=""></div>
 </section>
 
 <!-- ============ REHASPORT (Zeiten wie Website /rehasport-in-magstadt, Stand 15.10.2026) ============ -->
-<section class="folie" data-id="rehasport">
+<section class="folie v-foto v-gespiegelt" data-id="rehasport">
   <div>
     <div class="dach ein">Rehasport auf Rezept</div>
     <h2 class="ein mittel" style="--d:1">Rehasport in Magstadt</h2>
@@ -377,7 +454,7 @@ p strong{color:#fff;font-weight:650}
     </table>
     <div class="hinweis ein" style="--d:4">Anmeldung am Empfang oder unter 07159&nbsp;45151</div>
   </div>
-  <div class="foto ein" style="--d:2"><img src="bilder/rehasport-gruppe.jpg" alt=""></div>
+  <div class="hintergrund"><img src="bilder/rehasport-gruppe.jpg" alt=""></div>
 </section>
 
 <!-- ============ GOOGLE-BEWERTUNG (Text wie Tresenaufsteller) ============ -->
@@ -398,40 +475,40 @@ p strong{color:#fff;font-weight:650}
      REIHE: GESUNDHEIT. Grundlage: studien/2026-09_studienupdate.md (PubMed-Meta-Analysen).
      Regeln: keine Heilversprechen, Studie immer nennen, keine Krebs-Themen (§ 12 HWG).
      ================================================================ -->
-<section class="folie" data-reihe="gesundheit">
+<section class="folie v-panel" data-reihe="gesundheit">
   <div>
     <div class="dach ein">Gut zu wissen · Rücken</div>
     <h2 class="ein mittel" style="--d:1">Beim Rücken zählt, wie oft Sie trainieren.</h2>
     <p class="ein" style="--d:2">Eine neue Auswertung vieler Studien zu langanhaltenden Rückenschmerzen zeigt: Wer dreimal pro Woche oder öfter trainiert, kommt auf lange Sicht im Alltag besser zurecht als mit weniger Einheiten. Die Häufigkeit war dabei der deutlichste Faktor.</p>
     <div class="quelle ein" style="--d:3">Blanco-Heras u. a., Journal of Orthopaedic &amp; Sports Physical Therapy, 2026</div>
   </div>
-  <div class="ein" style="--d:2">
+  <div class="panel ein" style="--d:2">
     <div class="zahl"><b>3&nbsp;×</b><span>pro Woche</span></div>
     <div class="merke"><strong>Unser Tipp:</strong> Drei feste Trainingstage in den Kalender eintragen, wie einen Arzttermin.</div>
   </div>
 </section>
 
-<section class="folie" data-reihe="gesundheit">
+<section class="folie v-panel" data-reihe="gesundheit">
   <div>
     <div class="dach ein">Gut zu wissen · Knochen</div>
     <h2 class="ein" style="--d:1">Was den Knochen guttut</h2>
     <p class="ein" style="--d:2">124 Studien mit über 18.000 Teilnehmenden, ausgewertet im British Medical Journal: Die Knochendichte profitierte vor allem von zügigem Gehen oder Joggen und von Ausdauer- und Krafttraining in Kombination.</p>
     <div class="quelle ein" style="--d:3">Lu u. a., BMJ, 2026</div>
   </div>
-  <div class="ein" style="--d:2">
+  <div class="panel ein" style="--d:2">
     <div class="zahl"><b>150</b><span>Minuten zügige Bewegung pro Woche</span></div>
     <div class="merke">Ab etwa dieser Menge zeigte sich der Nutzen. Das sind zum Beispiel dreimal 50 Minuten.</div>
   </div>
 </section>
 
-<section class="folie" data-reihe="gesundheit">
+<section class="folie v-panel" data-reihe="gesundheit">
   <div>
     <div class="dach ein">Gut zu wissen · Knie</div>
     <h2 class="ein mittel" style="--d:1">Kniearthrose: mittlere Gewichte, dafür dranbleiben</h2>
     <p class="ein" style="--d:2">Eine Auswertung zum Krafttraining bei Kniearthrose kommt zu dem Ergebnis: Mittlere Gewichte schnitten besser ab als schwere. Kraft und Alltag verbesserten sich früh. Bei den Schmerzen brauchte es deutlich mehr Training über längere Zeit.</p>
     <div class="quelle ein" style="--d:3">Núñez-Cortés u. a., Journal of Orthopaedic &amp; Sports Physical Therapy, 2026</div>
   </div>
-  <div class="karte balken ein" style="--d:2">
+  <div class="panel karte balken ein" style="--d:2">
     <div class="preise-titel">Wiederholungen insgesamt bis zur größten Wirkung</div>
     <div><div class="b-kopf"><span>Kraft</span><b>ca. 1.600</b></div><i style="width:27%"></i></div>
     <div><div class="b-kopf"><span>Alltag und Beweglichkeit</span><b>ca. 2.600</b></div><i style="width:43%"></i></div>
@@ -439,28 +516,28 @@ p strong{color:#fff;font-weight:650}
   </div>
 </section>
 
-<section class="folie" data-reihe="gesundheit">
+<section class="folie v-panel" data-reihe="gesundheit">
   <div>
     <div class="dach ein">Gut zu wissen · Gleichgewicht</div>
     <h2 class="ein mittel" style="--d:1">Training senkt das Sturzrisiko im Alter.</h2>
     <p class="ein" style="--d:2">Übungen für Gleichgewicht und Kraft senken bei älteren Menschen, die zu Hause leben, die Zahl der Stürze um fast ein Viertel. Das ist eines der am besten belegten Ergebnisse der Bewegungsforschung.</p>
     <div class="quelle ein" style="--d:3">Cochrane-Review, Sherrington u. a., 2019</div>
   </div>
-  <div class="ein" style="--d:2">
+  <div class="panel ein" style="--d:2">
     <div class="zahl"><b>−23&nbsp;%</b><span>Stürze</span></div>
     <div class="merke">Den Kurs <strong>Sturzprophylaxe</strong> finden Sie in unserem Kursplan.</div>
   </div>
 </section>
 
-<section class="folie" data-reihe="gesundheit">
+<section class="folie v-panel" data-reihe="gesundheit">
   <div>
     <div class="dach ein">Gut zu wissen · Alltag</div>
     <h2 class="ein mittel" style="--d:1">Bewegungshäppchen: kurz, aber über den Tag verteilt</h2>
     <p class="ein" style="--d:2">Mehrere kurze Übungsblöcke am Tag statt einer langen Einheit: Bei Kniearthrose haben solche „Exercise Snacks“ in Studien Schmerz und Beweglichkeit kurzfristig deutlich verbessert. Wie lange die Wirkung anhält, ist noch offen.</p>
     <div class="quelle ein" style="--d:3">Meng u. a., Archives of Physical Medicine and Rehabilitation, 2026</div>
   </div>
-  <div class="ein" style="--d:2">
-    <div class="zahl"><b style="font-size:9rem">Kurz<br>und oft</b></div>
+  <div class="panel ein" style="--d:2">
+    <div class="zahl"><b style="font-size:7rem;line-height:1">Kurz<br>und oft</b></div>
     <div class="merke">Fragen Sie uns nach zwei, drei Übungen für zu Hause.</div>
   </div>
 </section>
@@ -468,7 +545,7 @@ p strong{color:#fff;font-weight:650}
 <!-- ================================================================
      REIHE: RICHTIG TRAINIEREN (passend zu den Vector-MED-Geraeten und dem Funktionalbereich)
      ================================================================ -->
-<section class="folie" data-reihe="uebung">
+<section class="folie v-reihe" data-reihe="uebung">
   <div>
     <div class="dach ein">Richtig trainieren</div>
     <h2 class="ein" style="--d:1">Erst einstellen, dann trainieren</h2>
@@ -482,7 +559,7 @@ p strong{color:#fff;font-weight:650}
   </ol>
 </section>
 
-<section class="folie" data-reihe="uebung">
+<section class="folie v-reihe" data-reihe="uebung">
   <div>
     <div class="dach ein">Richtig trainieren</div>
     <h2 class="ein" style="--d:1">Atmen nicht vergessen</h2>
@@ -496,7 +573,7 @@ p strong{color:#fff;font-weight:650}
   </ol>
 </section>
 
-<section class="folie" data-reihe="uebung">
+<section class="folie v-reihe" data-reihe="uebung">
   <div>
     <div class="dach ein">Richtig trainieren</div>
     <h2 class="ein" style="--d:1">Ruhig und kontrolliert</h2>
@@ -510,7 +587,7 @@ p strong{color:#fff;font-weight:650}
   </ol>
 </section>
 
-<section class="folie" data-reihe="uebung">
+<section class="folie v-reihe" data-reihe="uebung">
   <div>
     <div class="dach ein">Richtig trainieren</div>
     <h2 class="ein" style="--d:1">Beinpresse und Kniebeuge</h2>
@@ -524,7 +601,7 @@ p strong{color:#fff;font-weight:650}
   </ol>
 </section>
 
-<section class="folie" data-reihe="uebung">
+<section class="folie v-reihe" data-reihe="uebung">
   <div>
     <div class="dach ein">Richtig trainieren</div>
     <h2 class="ein" style="--d:1">Rudern und Latzug</h2>
@@ -538,7 +615,7 @@ p strong{color:#fff;font-weight:650}
   </ol>
 </section>
 
-<section class="folie" data-reihe="uebung">
+<section class="folie v-reihe" data-reihe="uebung">
   <div>
     <div class="dach ein">Richtig trainieren</div>
     <h2 class="ein" style="--d:1">Heben vom Boden</h2>
@@ -552,7 +629,7 @@ p strong{color:#fff;font-weight:650}
   </ol>
 </section>
 
-<section class="folie" data-reihe="uebung">
+<section class="folie v-reihe" data-reihe="uebung">
   <div>
     <div class="dach ein">Richtig trainieren</div>
     <h2 class="ein" style="--d:1">Ziehen ja, Stechen nein</h2>
@@ -570,7 +647,7 @@ p strong{color:#fff;font-weight:650}
      REIHE: REZEPTE. Eiweissangaben gerundet nach ueblichen Naehrwerttabellen (geschaetzt,
      deshalb "etwa" - siehe Lektion 06.10.2026 im Vault).
      ================================================================ -->
-<section class="folie" data-reihe="rezept">
+<section class="folie v-hell" data-reihe="rezept">
   <div>
     <div class="dach ein">Rezeptidee · eiweißreich</div>
     <h2 class="ein" style="--d:1">Quark mit Beeren und Haferflocken</h2>
@@ -585,12 +662,12 @@ p strong{color:#fff;font-weight:650}
       <li><b>150 g</b>Beeren, auch tiefgekühlt</li>
       <li><b>3 EL</b>Haferflocken</li>
       <li><b>1 EL</b>gehackte Nüsse</li>
-      <li><b>nach Wunsch</b>etwas Zimt</li>
+      <li><b>etwas</b>Zimt, nach Wunsch</li>
     </ul>
   </div>
 </section>
 
-<section class="folie" data-reihe="rezept">
+<section class="folie v-hell" data-reihe="rezept">
   <div>
     <div class="dach ein">Rezeptidee · eiweißreich</div>
     <h2 class="ein" style="--d:1">Rote-Linsen-Suppe</h2>
@@ -612,7 +689,7 @@ p strong{color:#fff;font-weight:650}
   </div>
 </section>
 
-<section class="folie" data-reihe="rezept">
+<section class="folie v-hell" data-reihe="rezept">
   <div>
     <div class="dach ein">Rezeptidee · eiweißreich</div>
     <h2 class="ein" style="--d:1">Rührei mit Spinat</h2>
@@ -631,7 +708,7 @@ p strong{color:#fff;font-weight:650}
   </div>
 </section>
 
-<section class="folie" data-reihe="rezept">
+<section class="folie v-hell" data-reihe="rezept">
   <div>
     <div class="dach ein">Rezeptidee · eiweißreich</div>
     <h2 class="ein mittel" style="--d:1">Ofengemüse mit Kichererbsen und Feta</h2>
@@ -652,7 +729,7 @@ p strong{color:#fff;font-weight:650}
   </div>
 </section>
 
-<section class="folie" data-reihe="rezept">
+<section class="folie v-hell" data-reihe="rezept">
   <div>
     <div class="dach ein">Rezeptidee · eiweißreich</div>
     <h2 class="ein" style="--d:1">Hüttenkäse-Brot mit Radieschen</h2>
@@ -699,10 +776,11 @@ p strong{color:#fff;font-weight:650}
 
   // Reihenfolge eines Durchlaufs. "reihe:x" = naechste Folie aus der Themenreihe x.
   // Abgelaufene oder noch nicht faellige Folien werden uebersprungen.
+  // Reihenfolge so gemischt, dass aehnliche Aufbauten (Foto, gespiegelt, hell ...) nicht aufeinander folgen.
   var ABLAUF = [
-    'kursplan', 'ersttestung', 'reihe:gesundheit', 'aufbauprogramm', 'reihe:uebung',
-    'samstag', 'checkup', 'reihe:rezept', 'squash', 'sporttherapie', 'rehasport',
-    'bewertung', 'gutscheine'
+    'kursplan', 'ersttestung', 'reihe:gesundheit', 'squash', 'reihe:uebung', 'checkup',
+    'reihe:rezept', 'aufbauprogramm', 'samstag', 'sporttherapie', 'bewertung', 'rehasport',
+    'gutscheine'
   ];
 
   // Oeffnungszeiten je Wochentag (0 = Sonntag)
