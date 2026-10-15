@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>BKS Fernseher</title>
+<!--
+  Slides fuer den Fernseher im Aufenthaltsraum.
+
+  Wie es laeuft:
+  - Die Seite wechselt selbst von Folie zu Folie und laedt sich alle 30 Minuten neu
+    (nur wenn der Server erreichbar ist - sonst bliebe nach einem WLAN-Aussetzer eine
+    Fehlerseite stehen, die nie wieder verschwindet).
+  - Der Kursplan kommt live aus dem oeffentlichen Virtuagym-Terminplan (embedded=1),
+    braucht also weder Zugangsdaten noch einen laufenden PC.
+  - Folien mit data-ab / data-bis erscheinen und verschwinden zum Datum von selbst.
+    data-bis ist der erste Zeitpunkt, an dem die Folie NICHT mehr erscheint.
+  - Folien mit data-reihe bilden eine Themenreihe: pro Durchlauf kommt jeweils die
+    naechste Folie der Reihe. ABLAUF unten legt die Reihenfolge fest.
+
+  Testen im Browser:
+    ?folie=squash              nur diese Folie zeigen
+    ?folie=uebung&nr=3         dritte Folie der Reihe "uebung"
+    ?datum=2026-11-30T10:00    so tun, als waere es dieser Zeitpunkt
+    ?tempo=4                   4 Sekunden je Folie
+
+  Schrift: alles in rem. 1rem = 1 % der Breite einer 16:9-Flaeche, per Skript gesetzt
+  (CSS min() kennen aeltere Samsung-Browser nicht). Skript bewusst in ES5.
+-->
+<link rel="stylesheet" href="schriften.css">
+<style>
+:root{
+  --grund:   #0f1438;
+  --grund-2: #1a2260;
+  --indigo:  #3D4BA7;   /* Logofarbe */
+  --hellblau:#5894D5;   /* Logofarbe */
+  --hell:    #e8eeff;
+  --text-2:  rgba(232,238,255,.82);
+  --text-3:  rgba(232,238,255,.58);
+  --flaeche: rgba(255,255,255,.065);
+  --linie:   rgba(255,255,255,.14);
+  --papier:  #ffffff;
+  --tinte:   #111318;
+}
+html{font-size:1vw}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--grund);color:#fff;cursor:none}
+body{font-family:'Inter',system-ui,sans-serif;font-synthesis:none;-webkit-font-smoothing:antialiased;
+  font-feature-settings:"tnum" 0, "cv11" 1}
+*{box-sizing:border-box}
+
+#buehne{position:fixed;top:0;right:0;bottom:0;left:0;
+  background:
+    radial-gradient(70rem 40rem at 88% -8%, rgba(88,148,213,.22), transparent 70%),
+    radial-gradient(60rem 36rem at -10% 110%, rgba(61,75,167,.35), transparent 70%),
+    linear-gradient(160deg, var(--grund-2), var(--grund) 72%)}
+
+/* ---------- Folien ---------- */
+.folie{position:absolute;top:0;left:0;right:0;bottom:7.2rem;
+  padding:4.2rem 5.5rem 2.6rem;display:grid;grid-template-columns:1.12fr 1fr;grid-gap:4.5rem;
+  align-items:center;opacity:0;visibility:hidden;transition:opacity .9s ease, visibility 0s linear .9s}
+.folie.aktiv{opacity:1;visibility:visible;transition:opacity .9s ease, visibility 0s}
+.folie.eng{grid-template-columns:1fr 1fr}
+
+.folie .ein{opacity:0;transform:translateY(1.2rem)}
+.folie.aktiv .ein{animation:rein .8s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--d, 0) * 90ms + 150ms)}
+@keyframes rein{from{opacity:0;transform:translateY(1.2rem)}to{opacity:1;transform:none}}
+
+.dach{font-size:1.3rem;font-weight:650;letter-spacing:.14em;text-transform:uppercase;color:var(--hellblau);margin:0 0 1.6rem}
+h2{font-size:4.1rem;line-height:1.07;font-weight:720;letter-spacing:-.015em;margin:0 0 1.4rem;color:#fff}
+h2.mittel{font-size:3.5rem}
+.akzent{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;font-size:3.1rem;line-height:1.15;color:var(--hell);margin:0 0 1.8rem}
+p{font-size:1.75rem;line-height:1.48;color:var(--text-2);margin:0 0 1.5rem;max-width:46rem}
+p strong{color:#fff;font-weight:650}
+.hinweis{display:inline-block;font-size:1.6rem;font-weight:600;color:#fff;padding:1rem 1.5rem;border-radius:.8rem;
+  background:rgba(88,148,213,.16);border:1px solid rgba(88,148,213,.45);margin-top:.6rem}
+.quelle{font-size:1.1rem;color:var(--text-3);margin-top:1.6rem;line-height:1.4}
+.klein{font-size:1.25rem;color:var(--text-3);line-height:1.4}
+
+/* Karten rechts */
+.karte{background:var(--flaeche);border:1px solid var(--linie);border-radius:1.6rem;padding:2.6rem 2.8rem}
+.karte.hell{background:var(--papier);color:var(--tinte);border:0}
+.foto{width:100%;height:40rem;border-radius:1.6rem;overflow:hidden;position:relative;
+  box-shadow:0 2rem 4rem rgba(0,0,0,.35)}
+.foto img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* Grosse Zahl */
+.zahl{text-align:left}
+.zahl b{display:block;font-size:12rem;line-height:.95;font-weight:780;letter-spacing:-.04em;color:var(--hellblau)}
+.zahl span{display:block;font-size:2rem;color:var(--hell);margin-top:1.2rem;font-weight:500}
+.merke{margin-top:2.4rem;padding-top:1.8rem;border-top:1px solid var(--linie);font-size:1.6rem;line-height:1.45;color:var(--text-2)}
+.merke strong{color:#fff}
+
+/* Preislisten */
+.preise{width:100%;border-collapse:collapse}
+.preise th{font-size:1.15rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);text-align:right;padding:0 0 1rem 1.5rem}
+.preise th:first-child{text-align:left;padding-left:0}
+.preise td{font-size:1.7rem;padding:1.15rem 0;border-top:1px solid var(--linie);color:var(--text-2);vertical-align:baseline}
+.preise td.p{text-align:right;color:#fff;font-weight:650;white-space:nowrap;padding-left:1.5rem;font-feature-settings:"tnum" 1}
+.preise td small{display:block;font-size:1.2rem;color:var(--text-3);margin-top:.25rem}
+.preise.kompakt td{padding:.75rem 0;font-size:1.6rem}
+.preise-titel{font-size:1.3rem;font-weight:650;letter-spacing:.12em;text-transform:uppercase;color:var(--hellblau);margin:0 0 1.4rem}
+
+/* Nummerierte Schritte */
+.schritte{list-style:none;margin:0;padding:0;counter-reset:s}
+.schritte li{counter-increment:s;position:relative;padding:1.7rem 1.8rem 1.7rem 6.4rem;margin-bottom:1.2rem;
+  background:var(--flaeche);border:1px solid var(--linie);border-radius:1.2rem;font-size:1.8rem;line-height:1.4;color:#fff}
+.schritte li:before{content:counter(s);position:absolute;left:1.8rem;top:50%;margin-top:-1.7rem;width:3.4rem;height:3.4rem;border-radius:50%;
+  background:var(--hellblau);color:var(--grund);font-weight:750;font-size:1.7rem;line-height:3.4rem;text-align:center}
+.schritte li small{display:block;font-size:1.35rem;color:var(--text-2);margin-top:.35rem;font-weight:400}
+.fehler{margin-top:1.8rem;font-size:1.55rem;line-height:1.45;color:var(--text-2);padding-left:1.4rem;border-left:.35rem solid #e08a5b}
+.fehler strong{color:#fff}
+
+/* Kursplan */
+.folie.kursplan{display:block;padding-top:3.4rem}
+.kopf{display:-webkit-box;display:flex;-webkit-box-align:end;align-items:flex-end;justify-content:space-between;margin-bottom:1.8rem}
+.kopf h2{margin:0;font-size:3.3rem}
+.kopf .dach{margin-bottom:.8rem}
+.kopf .rechts{text-align:right;font-size:1.45rem;line-height:1.45;color:var(--text-2)}
+.kopf .rechts strong{color:#fff}
+.kursplan-karte{position:relative;background:#fff;border-radius:1.4rem;overflow:hidden;height:calc(100% - 8rem)}
+.kursplan-karte iframe{position:absolute;top:0;left:0;border:0;-webkit-transform-origin:0 0;transform-origin:0 0;background:#fff}
+.kursplan-hinweis{position:absolute;top:0;left:0;right:0;bottom:0;display:none;align-items:center;justify-content:center;color:#555;font-size:1.8rem}
+
+/* Kacheln (Offener Samstag) */
+.kacheln .kachel{display:-webkit-box;display:flex;margin-bottom:1.3rem;background:var(--flaeche);border:1px solid var(--linie);border-radius:1.2rem;padding:1.8rem 2rem}
+.kachel .nr{flex:0 0 auto;width:3.6rem;height:3.6rem;border-radius:50%;border:2px solid var(--hellblau);color:var(--hellblau);
+  font-weight:750;font-size:1.7rem;line-height:3.3rem;text-align:center;margin-right:1.8rem}
+.kachel h3{margin:0 0 .4rem;font-size:2rem;font-weight:680;color:#fff}
+.kachel p{margin:0;font-size:1.45rem;line-height:1.42}
+.stempel{display:inline-block;font-size:1.7rem;font-weight:700;color:var(--grund);background:var(--hell);padding:.9rem 1.5rem;border-radius:.8rem;margin-right:1rem}
+
+/* Zeitleiste (Aufbauprogramm) */
+.leiste{position:relative;padding-left:3rem}
+.leiste:before{content:"";position:absolute;left:.85rem;top:1.2rem;bottom:1.2rem;width:2px;background:var(--linie)}
+.leiste div{position:relative;display:-webkit-box;display:flex;align-items:baseline;padding:.75rem 0;font-size:1.75rem;color:#fff}
+.leiste div:before{content:"";position:absolute;left:-2.75rem;top:50%;margin-top:-.7rem;width:1.4rem;height:1.4rem;border-radius:50%;
+  background:var(--grund);border:2px solid var(--hellblau)}
+.leiste div.st:before{background:var(--hellblau)}
+.leiste div.ziel:before{background:var(--hell);border-color:var(--hell)}
+.leiste em{font-style:normal;flex:0 0 9.5rem;font-size:1.3rem;font-weight:650;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3)}
+.leiste span{color:var(--text-3);font-size:1.4rem;margin-left:.8rem}
+
+/* Balken (Knie) */
+.balken div{margin-bottom:2rem}
+.balken .b-kopf{display:-webkit-box;display:flex;justify-content:space-between;font-size:1.6rem;color:var(--text-2);margin-bottom:.7rem}
+.balken .b-kopf b{color:#fff;font-weight:650;font-feature-settings:"tnum" 1}
+.balken i{display:block;height:1.6rem;border-radius:.8rem;background:linear-gradient(90deg,var(--indigo),var(--hellblau))}
+
+/* Rezept */
+.meta{margin:0 0 2rem}
+.meta span{display:inline-block;font-size:1.4rem;font-weight:600;color:#fff;background:var(--flaeche);border:1px solid var(--linie);
+  border-radius:2rem;padding:.6rem 1.3rem;margin:0 .6rem .6rem 0}
+.zutaten{list-style:none;margin:0;padding:0}
+.zutaten li{font-size:1.65rem;line-height:1.35;padding:.85rem 0;border-top:1px solid rgba(17,19,24,.1);color:var(--tinte)}
+.zutaten li:first-child{border-top:0}
+.zutaten li{display:-webkit-box;display:flex}
+.zutaten li b{flex:0 0 11rem;font-weight:650;color:var(--indigo)}
+
+/* QR */
+.qr{display:-webkit-box;display:flex;flex-direction:column;align-items:center;text-align:center}
+.qr img{width:27rem;height:27rem;display:block}
+.qr .unter{font-size:1.7rem;font-weight:650;color:var(--tinte);margin-top:1.4rem}
+
+/* ---------- Fusszeile ---------- */
+.fuss{position:fixed;left:0;right:0;bottom:0;height:7.2rem;display:-webkit-box;display:flex;align-items:center;justify-content:space-between;
+  padding:0 5.5rem;border-top:1px solid var(--linie);background:rgba(10,13,40,.55)}
+.fuss img{height:3.6rem;display:block}
+.fuss .zeit{display:-webkit-box;display:flex;align-items:center}
+.fuss .offen{font-size:1.4rem;color:var(--text-2);margin-right:2.6rem;text-align:right;line-height:1.35}
+.fuss .offen strong{color:#fff;font-weight:600}
+.fuss .uhr{font-size:2.9rem;font-weight:650;letter-spacing:-.01em;font-feature-settings:"tnum" 1;color:#fff}
+.fortschritt{position:absolute;left:0;top:-1px;height:3px;width:0;background:var(--hellblau)}
+</style>
+</head>
+<body>
+<div id="buehne">
+
+<!-- ============ KURSPLAN (live aus Virtuagym) ============ -->
+<section class="folie kursplan" data-id="kursplan" data-dauer="25">
+  <div class="kopf ein">
+    <div>
+      <div class="dach">Kursplan</div>
+      <h2 id="kursplan-titel">Kurse diese Woche</h2>
+    </div>
+    <div class="rechts">In jeder Mitgliedschaft <strong>alle Kurse inklusive</strong><br>Ohne Mitgliedschaft: 10er-Kurskarte für 150&nbsp;€</div>
+  </div>
+  <div class="kursplan-karte ein" style="--d:1">
+    <iframe id="kursplan-rahmen" title="Kursplan" scrolling="no"></iframe>
+  </div>
+</section>
+
+<!-- ============ ERSTTESTUNG-AKTION (Termine bis 15.12.) ============ -->
+<section class="folie" data-id="ersttestung" data-bis="2026-12-16T00:00">
+  <div>
+    <div class="dach ein">Aktion bis 15. Dezember</div>
+    <h2 class="ein" style="--d:1">Sie kennen die Ersttestung.</h2>
+    <div class="akzent ein" style="--d:2">Erzählen Sie gern davon.</div>
+    <p class="ein" style="--d:3">Für Termine bis zum 15. Dezember kostet sie <strong>59,90&nbsp;€ statt 80&nbsp;€</strong>. Wir messen Kraft, Beweglichkeit und Gleichgewicht, besprechen die Ergebnisse und geben einen Ausdruck mit.</p>
+    <div class="hinweis ein" style="--d:4">Termine am Empfang oder unter 07159&nbsp;45151</div>
+  </div>
+  <div class="karte ein" style="--d:2">
+    <div class="preise-titel">Ersttestung</div>
+    <div class="zahl"><b>59,90&nbsp;€</b><span>statt <s>80&nbsp;€</s></span></div>
+    <div class="merke">Wer danach eine Mitgliedschaft abschließt, zahlt die Ersttestung <strong>nicht noch einmal</strong>.</div>
+  </div>
+</section>
+
+<!-- ============ OFFENER SAMSTAG (bis 28.11., 13 Uhr) ============
+     Bewusst ohne Aktionspreis und ohne Gutscheine: neben "Eintritt frei" las man sonst
+     "Ersttestung am Samstag umsonst" bzw. Gratis-Gutscheine (Vault, Offener-Samstag-2026). -->
+<section class="folie" data-id="samstag" data-bis="2026-11-28T13:00">
+  <div>
+    <div class="dach ein">Samstag, 28. November · 10 bis 13 Uhr</div>
+    <h2 class="ein" style="--d:1">Offener Samstag</h2>
+    <div class="akzent ein" style="--d:2">Bringen Sie jemanden mit.</div>
+    <p class="ein" style="--d:3">Partner, Eltern, Nachbarn oder Freunde können an diesem Vormittag einfach vorbeikommen und sehen, wie Sie hier trainieren.</p>
+    <div class="ein" style="--d:4"><span class="stempel">Eintritt frei</span><span class="klein">ohne Anmeldung</span></div>
+  </div>
+  <div class="kacheln">
+    <div class="kachel ein" style="--d:2"><div class="nr">1</div><div><h3>Kurzmessung der Beinkraft</h3><p>Im Sitzen, links und rechts im Vergleich. Das Ergebnis gibt es auf einer Karte zum Mitnehmen.</p></div></div>
+    <div class="kachel ein" style="--d:3"><div class="nr">2</div><div><h3>Squash ausprobieren</h3><p>Schläger und Bälle stellen wir. Nach einer kurzen Einweisung geht es los.</p></div></div>
+    <div class="kachel ein" style="--d:4"><div class="nr">3</div><div><h3>Trainingsfläche kennenlernen</h3><p>Kurz an ein Gerät setzen und ausprobieren, mit leichtem Gewicht und mit einem von uns daneben.</p></div></div>
+  </div>
+</section>
+
+<!-- ============ GUTSCHEINE (Verkauf ab 28.11., Preise bei Kauf bis 15.12.) ============ -->
+<section class="folie" data-id="gutscheine" data-ab="2026-11-28T00:00" data-bis="2026-12-16T00:00" data-schalter="gutscheine">
+  <div>
+    <div class="dach ein">Zum Verschenken</div>
+    <h2 class="ein" style="--d:1">Gutscheine für Familie und Freunde</h2>
+    <div class="akzent ein" style="--d:2">Zu kaufen am Empfang.</div>
+    <p class="ein" style="--d:3">Mit dem Gutschein fängt die beschenkte Person bei uns mit einer Ersttestung an. Den Gutschein gibt es als Karte mit Umschlag.</p>
+  </div>
+  <div class="karte ein" style="--d:2">
+    <div class="preise-titel">Gutscheine</div>
+    <table class="preise">
+      <tr><td>Ersttestung</td><td class="p">59,90&nbsp;€</td></tr>
+      <tr><td>10er-Karte Gerätetraining<small>inklusive Ersttestung</small></td><td class="p">200&nbsp;€</td></tr>
+    </table>
+    <div class="merke">Beide Preise gelten bei Kauf bis 15.12.</div>
+  </div>
+</section>
+
+<!-- ============ 3-MONATS-AUFBAUPROGRAMM ============ -->
+<section class="folie" data-id="aufbauprogramm">
+  <div>
+    <div class="dach ein">3-Monats-Aufbauprogramm</div>
+    <h2 class="ein" style="--d:1">Zwölf Wochen mit festem Plan</h2>
+    <div class="akzent ein" style="--d:2">Begleitet einsteigen, ohne lange Bindung.</div>
+    <p class="ein" style="--d:3">Sieben feste Termine, dazwischen trainieren Sie zweimal pro Woche, wann es Ihnen passt. Alle Kurse sind inklusive. Nach drei Monaten endet das Programm von selbst, eine Kündigung ist nicht nötig.</p>
+    <div class="ein" style="--d:4"><span class="stempel">349&nbsp;€ einmalig</span><span class="klein">keine Startgebühr</span></div>
+  </div>
+  <div class="karte ein" style="--d:2">
+    <div class="preise-titel">Ihre sieben Termine</div>
+    <div class="leiste">
+      <div><em>Woche 0</em>Ersttestung</div>
+      <div class="st"><em>Woche 1</em>Sporttherapie<span>60 Min.</span></div>
+      <div><em>Woche 4</em>Check-up</div>
+      <div class="st"><em>Woche 5</em>Sporttherapie<span>60 Min.</span></div>
+      <div><em>Woche 8</em>Check-up</div>
+      <div class="st"><em>Woche 9</em>Sporttherapie<span>60 Min.</span></div>
+      <div class="ziel"><em>Woche 12</em>Abschluss-Check-up</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CHECK-UP ============ -->
+<section class="folie" data-id="checkup">
+  <div>
+    <div class="dach ein">Check-up</div>
+    <h2 class="ein" style="--d:1">Was hat sich seit der Ersttestung getan?</h2>
+    <div class="akzent ein" style="--d:2">Zahlen statt Bauchgefühl.</div>
+    <p class="ein" style="--d:3">Wir messen Kraft, Beweglichkeit, Gleichgewicht und Bewegungsablauf noch einmal und vergleichen die Werte mit Ihrer Ersttestung. Danach passen wir Ihren Trainingsplan an.</p>
+    <div class="hinweis ein" style="--d:4">Termin am Empfang oder unter 07159&nbsp;45151</div>
+  </div>
+  <div class="karte ein" style="--d:2">
+    <div class="preise-titel">Check-up</div>
+    <table class="preise">
+      <tr><td>Für Mitglieder</td><td class="p">60&nbsp;€</td></tr>
+      <tr><td>Ohne Mitgliedschaft</td><td class="p">70&nbsp;€</td></tr>
+    </table>
+    <div class="merke">Im <strong>Premium-Tarif</strong> ist alle drei Monate ein Check-up inklusive.</div>
+  </div>
+</section>
+
+<!-- ============ SPORTTHERAPIE-SITZUNGEN ============ -->
+<section class="folie" data-id="sporttherapie">
+  <div>
+    <div class="dach ein">Sporttherapie</div>
+    <h2 class="ein mittel" style="--d:1">Einzelsitzung mit dem Sporttherapeuten</h2>
+    <p class="ein" style="--d:2">Die ganze Zeit für Ihr Anliegen: zum Beispiel nach einer Verletzung oder Operation, bei Beschwerden im Alltag oder wenn Sie eine Übung sauber lernen möchten.</p>
+    <table class="preise ein" style="--d:3;max-width:46rem">
+      <tr><th></th><th>Mitglieder</th><th>ohne Mitgliedschaft</th></tr>
+      <tr><td>30 Minuten</td><td class="p">40&nbsp;€</td><td class="p">50&nbsp;€</td></tr>
+      <tr><td>60 Minuten</td><td class="p">80&nbsp;€</td><td class="p">90&nbsp;€</td></tr>
+    </table>
+    <div class="quelle ein" style="--d:4;font-size:1.4rem;color:var(--text-2)">Regelmäßig? Als Paket ab 160&nbsp;€ im Monat (4 × 30 Minuten, Mindestlaufzeit 3 Monate).<br>Im Premium-Tarif sind alle drei Monate 30 Minuten inklusive.</div>
+  </div>
+  <div class="foto ein" style="--d:2"><img src="bilder/einzelsitzung.jpg" alt=""></div>
+</section>
+
+<!-- ============ SQUASH ============ -->
+<section class="folie" data-id="squash">
+  <div>
+    <div class="dach ein">Squash</div>
+    <h2 class="ein" style="--d:1">Lust auf eine Runde Squash?</h2>
+    <p class="ein" style="--d:2">Drei Courts im Haus. Buchen am Empfang, telefonisch unter 07159&nbsp;45151 oder online.</p>
+    <table class="preise ein" style="--d:3;max-width:46rem">
+      <tr><th>30 Minuten Court</th><th></th></tr>
+      <tr><td>Mo–Fr 8 bis 13:30 Uhr<small>und 16 bis 17 Uhr</small></td><td class="p">9&nbsp;€</td></tr>
+      <tr><td>Mo–Fr 17 bis 21:30 Uhr</td><td class="p">15&nbsp;€</td></tr>
+      <tr><td>Samstag 9 bis 13:30 Uhr</td><td class="p">12&nbsp;€</td></tr>
+    </table>
+    <div class="quelle ein" style="--d:4;font-size:1.4rem;color:var(--text-2)">Mit Wellpass: ein Check-in für 30 Minuten Spielzeit.</div>
+  </div>
+  <div class="foto ein" style="--d:2"><img src="bilder/squash-court.jpg" alt=""></div>
+</section>
+
+<!-- ============ REHASPORT (Zeiten wie Website /rehasport-in-magstadt, Stand 15.10.2026) ============ -->
+<section class="folie" data-id="rehasport">
+  <div>
+    <div class="dach ein">Rehasport auf Rezept</div>
+    <h2 class="ein mittel" style="--d:1">Rehasport in Magstadt</h2>
+    <p class="ein" style="--d:2">In kleinen Gruppen unter fachlicher Anleitung. Sie brauchen eine ärztliche Verordnung und die Genehmigung Ihrer Krankenkasse.</p>
+    <table class="preise kompakt ein" style="--d:3;max-width:40rem">
+      <tr><td>Montag</td><td class="p">10 und 18 Uhr</td></tr>
+      <tr><td>Dienstag</td><td class="p">11 Uhr</td></tr>
+      <tr><td>Mittwoch</td><td class="p">10 Uhr</td></tr>
+      <tr><td>Donnerstag</td><td class="p">10 Uhr</td></tr>
+      <tr><td>Freitag</td><td class="p">11 und 18 Uhr</td></tr>
+    </table>
+    <div class="hinweis ein" style="--d:4">Anmeldung am Empfang oder unter 07159&nbsp;45151</div>
+  </div>
+  <div class="foto ein" style="--d:2"><img src="bilder/rehasport-gruppe.jpg" alt=""></div>
+</section>
+
+<!-- ============ GOOGLE-BEWERTUNG (Text wie Tresenaufsteller) ============ -->
+<section class="folie" data-id="bewertung">
+  <div>
+    <div class="dach ein">Ihre Rückmeldung auf Google</div>
+    <h2 class="ein" style="--d:1">Was andere über uns lesen, schreiben Sie.</h2>
+    <p class="ein" style="--d:2">Wer nach betreutem Training oder einem Squash-Court sucht, liest zuerst, was andere hier geschrieben haben. Ein paar Sätze von Ihnen helfen den Menschen, die noch überlegen.</p>
+    <p class="ein klein" style="--d:3;font-size:1.45rem">Wir lesen jede Rückmeldung und antworten auf jede. Ganz freiwillig – und wenn Ihnen etwas nicht gefällt, schreiben Sie es bitte ebenso offen oder sprechen Sie uns direkt an.</p>
+  </div>
+  <div class="karte hell qr ein" style="--d:2">
+    <img src="bilder/qr-bewertung.svg" alt="QR-Code zur Google-Bewertung">
+    <div class="unter">Code scannen und Ihre Erfahrung schildern</div>
+  </div>
+</section>
+
+<!-- ================================================================
+     REIHE: GESUNDHEIT. Grundlage: studien/2026-09_studienupdate.md (PubMed-Meta-Analysen).
+     Regeln: keine Heilversprechen, Studie immer nennen, keine Krebs-Themen (§ 12 HWG).
+     ================================================================ -->
+<section class="folie" data-reihe="gesundheit">
+  <div>
+    <div class="dach ein">Gut zu wissen · Rücken</div>
+    <h2 class="ein mittel" style="--d:1">Beim Rücken zählt, wie oft Sie trainieren.</h2>
+    <p class="ein" style="--d:2">Eine neue Auswertung vieler Studien zu langanhaltenden Rückenschmerzen zeigt: Wer dreimal pro Woche oder öfter trainiert, kommt auf lange Sicht im Alltag besser zurecht als mit weniger Einheiten. Die Häufigkeit war dabei der deutlichste Faktor.</p>
+    <div class="quelle ein" style="--d:3">Blanco-Heras u. a., Journal of Orthopaedic &amp; Sports Physical Therapy, 2026</div>
+  </div>
+  <div class="ein" style="--d:2">
+    <div class="zahl"><b>3&nbsp;×</b><span>pro Woche</span></div>
+    <div class="merke"><strong>Unser Tipp:</strong> Drei feste Trainingstage in den Kalender eintragen, wie einen Arzttermin.</div>
+  </div>
+</section>
+
+<section class="folie" data-reihe="gesundheit">
+  <div>
+    <div class="dach ein">Gut zu wissen · Knochen</div>
+    <h2 class="ein" style="--d:1">Was den Knochen guttut</h2>
+    <p class="ein" style="--d:2">124 Studien mit über 18.000 Teilnehmenden, ausgewertet im British Medical Journal: Die Knochendichte profitierte vor allem von zügigem Gehen oder Joggen und von Ausdauer- und Krafttraining in Kombination.</p>
+    <div class="quelle ein" style="--d:3">Lu u. a., BMJ, 2026</div>
+  </div>
+  <div class="ein" style="--d:2">
+    <div class="zahl"><b>150</b><span>Minuten zügige Bewegung pro Woche</span></div>
+    <div class="merke">Ab etwa dieser Menge zeigte sich der Nutzen. Das sind zum Beispiel dreimal 50 Minuten.</div>
+  </div>
+</section>
+
+<section class="folie" data-reihe="gesundheit">
+  <div>
+    <div class="dach ein">Gut zu wissen · Knie</div>
+    <h2 class="ein mittel" style="--d:1">Kniearthrose: mittlere Gewichte, dafür dranbleiben</h2>
+    <p class="ein" style="--d:2">Eine Auswertung zum Krafttraining bei Kniearthrose kommt zu dem Ergebnis: Mittlere Gewichte schnitten besser ab als schwere. Kraft und Alltag verbesserten sich früh. Bei den Schmerzen brauchte es deutlich mehr Training über längere Zeit.</p>
+    <div class="quelle ein" style="--d:3">Núñez-Cortés u. a., Journal of Orthopaedic &amp; Sports Physical Therapy, 2026</div>
+  </div>
+  <div class="karte balken ein" style="--d:2">
+    <div class="preise-titel">Wiederholungen insgesamt bis zur größten Wirkung</div>
+    <div><div class="b-kopf"><span>Kraft</span><b>ca. 1.600</b></div><i style="width:27%"></i></div>
+    <div><div class="b-kopf"><span>Alltag und Beweglichkeit</span><b>ca. 2.600</b></div><i style="width:43%"></i></div>
+    <div><div class="b-kopf"><span>Schmerzen</span><b>ca. 6.000</b></div><i style="width:100%"></i></div>
+  </div>
+</section>
+
+<section class="folie" data-reihe="gesundheit">
+  <div>
+    <div class="dach ein">Gut zu wissen · Gleichgewicht</div>
+    <h2 class="ein mittel" style="--d:1">Training senkt das Sturzrisiko im Alter.</h2>
+    <p class="ein" style="--d:2">Übungen für Gleichgewicht und Kraft senken bei älteren Menschen, die zu Hause leben, die Zahl der Stürze um fast ein Viertel. Das ist eines der am besten belegten Ergebnisse der Bewegungsforschung.</p>
+    <div class="quelle ein" style="--d:3">Cochrane-Review, Sherrington u. a., 2019</div>
+  </div>
+  <div class="ein" style="--d:2">
+    <div class="zahl"><b>−23&nbsp;%</b><span>Stürze</span></div>
+    <div class="merke">Den Kurs <strong>Sturzprophylaxe</strong> finden Sie in unserem Kursplan.</div>
+  </div>
+</section>
+
+<section class="folie" data-reihe="gesundheit">
+  <div>
+    <div class="dach ein">Gut zu wissen · Alltag</div>
+    <h2 class="ein mittel" style="--d:1">Bewegungshäppchen: kurz, aber über den Tag verteilt</h2>
+    <p class="ein" style="--d:2">Mehrere kurze Übungsblöcke am Tag statt einer langen Einheit: Bei Kniearthrose haben solche „Exercise Snacks“ in Studien Schmerz und Beweglichkeit kurzfristig deutlich verbessert. Wie lange die Wirkung anhält, ist noch offen.</p>
+    <div class="quelle ein" style="--d:3">Meng u. a., Archives of Physical Medicine and Rehabilitation, 2026</div>
+  </div>
+  <div class="ein" style="--d:2">
+    <div class="zahl"><b style="font-size:9rem">Kurz<br>und oft</b></div>
+    <div class="merke">Fragen Sie uns nach zwei, drei Übungen für zu Hause.</div>
+  </div>
+</section>
+
+<!-- ================================================================
+     REIHE: RICHTIG TRAINIEREN (passend zu den Vector-MED-Geraeten und dem Funktionalbereich)
+     ================================================================ -->
+<section class="folie" data-reihe="uebung">
+  <div>
+    <div class="dach ein">Richtig trainieren</div>
+    <h2 class="ein" style="--d:1">Erst einstellen, dann trainieren</h2>
+    <p class="ein" style="--d:2">Ein gut eingestelltes Gerät führt die Bewegung so, wie sie gedacht ist. Das dauert eine halbe Minute und lohnt sich bei jeder Übung.</p>
+    <div class="fehler ein" style="--d:3"><strong>Unsicher?</strong> Sprechen Sie uns an, wir stellen das Gerät gemeinsam mit Ihnen ein.</div>
+  </div>
+  <ol class="schritte">
+    <li class="ein" style="--d:2">Drehpunkt des Geräts auf Höhe des Gelenks<small>beim Beinstrecker zum Beispiel auf Höhe des Knies</small></li>
+    <li class="ein" style="--d:3">Rücken an der Lehne, Füße fest am Boden</li>
+    <li class="ein" style="--d:4">Polster so, dass nichts drückt oder rutscht</li>
+  </ol>
+</section>
+
+<section class="folie" data-reihe="uebung">
+  <div>
+    <div class="dach ein">Richtig trainieren</div>
+    <h2 class="ein" style="--d:1">Atmen nicht vergessen</h2>
+    <p class="ein" style="--d:2">Viele halten bei der Anstrengung unbewusst die Luft an. Dabei steigt der Druck im Körper unnötig stark an.</p>
+    <div class="fehler ein" style="--d:3"><strong>Besonders wichtig</strong> bei Bluthochdruck: nicht pressen.</div>
+  </div>
+  <ol class="schritte">
+    <li class="ein" style="--d:2">Bei der Anstrengung ausatmen</li>
+    <li class="ein" style="--d:3">Beim Zurückführen einatmen</li>
+    <li class="ein" style="--d:4">Gleichmäßig weiteratmen<small>auch bei der letzten, schweren Wiederholung</small></li>
+  </ol>
+</section>
+
+<section class="folie" data-reihe="uebung">
+  <div>
+    <div class="dach ein">Richtig trainieren</div>
+    <h2 class="ein" style="--d:1">Ruhig und kontrolliert</h2>
+    <p class="ein" style="--d:2">Langsame Wiederholungen fordern den Muskel mehr als schnelle und schonen die Gelenke.</p>
+    <div class="fehler ein" style="--d:3"><strong>Häufiger Fehler:</strong> Die Gewichte am Ende jeder Wiederholung aufschlagen lassen.</div>
+  </div>
+  <ol class="schritte">
+    <li class="ein" style="--d:2">Etwa 2 Sekunden in die Anstrengung</li>
+    <li class="ein" style="--d:3">2 bis 3 Sekunden zurück</li>
+    <li class="ein" style="--d:4">Kein Schwung, kein Abfedern<small>am Umkehrpunkt kurz die Spannung halten</small></li>
+  </ol>
+</section>
+
+<section class="folie" data-reihe="uebung">
+  <div>
+    <div class="dach ein">Richtig trainieren</div>
+    <h2 class="ein" style="--d:1">Beinpresse und Kniebeuge</h2>
+    <p class="ein" style="--d:2">Die Beine tragen Sie durch den ganzen Alltag: Treppen, Aufstehen, Einkaufen. Hier lohnt sich saubere Technik besonders.</p>
+    <div class="fehler ein" style="--d:3"><strong>Häufiger Fehler:</strong> Die Knie kippen beim Drücken nach innen.</div>
+  </div>
+  <ol class="schritte">
+    <li class="ein" style="--d:2">Knie zeigen in Richtung der Fußspitzen</li>
+    <li class="ein" style="--d:3">Die ganze Fußsohle bleibt auf der Platte<small>Druck über die Fersen</small></li>
+    <li class="ein" style="--d:4">Oben die Knie nicht ganz durchdrücken</li>
+  </ol>
+</section>
+
+<section class="folie" data-reihe="uebung">
+  <div>
+    <div class="dach ein">Richtig trainieren</div>
+    <h2 class="ein" style="--d:1">Rudern und Latzug</h2>
+    <p class="ein" style="--d:2">Bei Zugübungen arbeitet der obere Rücken. Das gelingt nur, wenn die Schulterblätter mitmachen.</p>
+    <div class="fehler ein" style="--d:3"><strong>Häufiger Fehler:</strong> Mit dem Oberkörper nach hinten lehnen und so Schwung holen.</div>
+  </div>
+  <ol class="schritte">
+    <li class="ein" style="--d:2">Erst die Schulterblätter nach hinten unten ziehen<small>dann die Arme beugen</small></li>
+    <li class="ein" style="--d:3">Schultern weg von den Ohren</li>
+    <li class="ein" style="--d:4">Oberkörper ruhig und aufrecht</li>
+  </ol>
+</section>
+
+<section class="folie" data-reihe="uebung">
+  <div>
+    <div class="dach ein">Richtig trainieren</div>
+    <h2 class="ein" style="--d:1">Heben vom Boden</h2>
+    <p class="ein" style="--d:2">Ob Hantel im Funktionalbereich oder Getränkekiste zu Hause: Die Technik ist dieselbe.</p>
+    <div class="fehler ein" style="--d:3"><strong>Häufiger Fehler:</strong> Mit rundem Rücken und gestreckten Beinen nach unten greifen.</div>
+  </div>
+  <ol class="schritte">
+    <li class="ein" style="--d:2">Aus der Hüfte beugen, Rücken lang</li>
+    <li class="ein" style="--d:3">Gewicht nah am Körper</li>
+    <li class="ein" style="--d:4">Aus den Beinen hochdrücken<small>nicht aus dem Rücken ziehen</small></li>
+  </ol>
+</section>
+
+<section class="folie" data-reihe="uebung">
+  <div>
+    <div class="dach ein">Richtig trainieren</div>
+    <h2 class="ein" style="--d:1">Ziehen ja, Stechen nein</h2>
+    <p class="ein" style="--d:2">Training darf anstrengend sein. Ihr Körper sagt Ihnen aber deutlich, wo die Grenze liegt.</p>
+    <div class="fehler ein" style="--d:3"><strong>Im Zweifel:</strong> lieber einmal zu früh fragen.</div>
+  </div>
+  <ol class="schritte">
+    <li class="ein" style="--d:2">Ein Ziehen oder Brennen im Muskel ist normal</li>
+    <li class="ein" style="--d:3">Stechender Schmerz im Gelenk ist ein Stoppsignal</li>
+    <li class="ein" style="--d:4">Dann aufhören und uns ansprechen<small>wir passen die Übung an</small></li>
+  </ol>
+</section>
+
+<!-- ================================================================
+     REIHE: REZEPTE. Eiweissangaben gerundet nach ueblichen Naehrwerttabellen (geschaetzt,
+     deshalb "etwa" - siehe Lektion 06.10.2026 im Vault).
+     ================================================================ -->
+<section class="folie" data-reihe="rezept">
+  <div>
+    <div class="dach ein">Rezeptidee · eiweißreich</div>
+    <h2 class="ein" style="--d:1">Quark mit Beeren und Haferflocken</h2>
+    <div class="meta ein" style="--d:2"><span>5 Minuten</span><span>1 Portion</span><span>etwa 35&nbsp;g Eiweiß</span></div>
+    <p class="ein" style="--d:3">Quark mit der Milch cremig rühren. Beeren, Haferflocken und Nüsse darübergeben, fertig. Tiefgekühlte Beeren am Vorabend in den Kühlschrank stellen.</p>
+    <div class="quelle ein" style="--d:4">Eiweißangabe gerundet nach üblichen Nährwerttabellen</div>
+  </div>
+  <div class="karte hell ein" style="--d:2">
+    <ul class="zutaten">
+      <li><b>250 g</b>Magerquark</li>
+      <li><b>3–4 EL</b>Milch</li>
+      <li><b>150 g</b>Beeren, auch tiefgekühlt</li>
+      <li><b>3 EL</b>Haferflocken</li>
+      <li><b>1 EL</b>gehackte Nüsse</li>
+      <li><b>nach Wunsch</b>etwas Zimt</li>
+    </ul>
+  </div>
+</section>
+
+<section class="folie" data-reihe="rezept">
+  <div>
+    <div class="dach ein">Rezeptidee · eiweißreich</div>
+    <h2 class="ein" style="--d:1">Rote-Linsen-Suppe</h2>
+    <div class="meta ein" style="--d:2"><span>25 Minuten</span><span>2 Portionen</span><span>etwa 25&nbsp;g Eiweiß pro Portion</span></div>
+    <p class="ein" style="--d:3">Zwiebel und Karotte klein schneiden und im Öl andünsten. Linsen, Tomaten, Brühe und Kreuzkümmel dazugeben und 15 Minuten köcheln lassen. Pürieren und mit Zitrone, Salz und Pfeffer abschmecken.</p>
+    <div class="quelle ein" style="--d:4">Eiweißangabe gerundet nach üblichen Nährwerttabellen</div>
+  </div>
+  <div class="karte hell ein" style="--d:2">
+    <ul class="zutaten">
+      <li><b>200 g</b>rote Linsen</li>
+      <li><b>1</b>Zwiebel</li>
+      <li><b>1</b>Karotte</li>
+      <li><b>1 Dose</b>stückige Tomaten</li>
+      <li><b>800 ml</b>Gemüsebrühe</li>
+      <li><b>1 TL</b>Kreuzkümmel</li>
+      <li><b>1 EL</b>Olivenöl</li>
+      <li><b>½</b>Zitrone, der Saft</li>
+    </ul>
+  </div>
+</section>
+
+<section class="folie" data-reihe="rezept">
+  <div>
+    <div class="dach ein">Rezeptidee · eiweißreich</div>
+    <h2 class="ein" style="--d:1">Rührei mit Spinat</h2>
+    <div class="meta ein" style="--d:2"><span>10 Minuten</span><span>1 Portion</span><span>etwa 25&nbsp;g Eiweiß</span></div>
+    <p class="ein" style="--d:3">Den Spinat im Öl kurz zusammenfallen lassen. Die verquirlten Eier dazugeben und bei mittlerer Hitze stocken lassen. Mit halbierten Tomaten und dem Brot servieren.</p>
+    <div class="quelle ein" style="--d:4">Eiweißangabe gerundet nach üblichen Nährwerttabellen</div>
+  </div>
+  <div class="karte hell ein" style="--d:2">
+    <ul class="zutaten">
+      <li><b>3</b>Eier</li>
+      <li><b>1 Handvoll</b>Babyspinat</li>
+      <li><b>4</b>Kirschtomaten</li>
+      <li><b>1 Scheibe</b>Vollkornbrot</li>
+      <li><b>1 TL</b>Öl, Salz, Pfeffer</li>
+    </ul>
+  </div>
+</section>
+
+<section class="folie" data-reihe="rezept">
+  <div>
+    <div class="dach ein">Rezeptidee · eiweißreich</div>
+    <h2 class="ein mittel" style="--d:1">Ofengemüse mit Kichererbsen und Feta</h2>
+    <div class="meta ein" style="--d:2"><span>40 Minuten</span><span>2 Portionen</span><span>etwa 20&nbsp;g Eiweiß pro Portion</span></div>
+    <p class="ein" style="--d:3">Ofen auf 200 Grad vorheizen. Gemüse in Stücke schneiden, mit Kichererbsen, Öl und Gewürzen mischen und 20 Minuten backen. Feta darüberbröseln und weitere 10 Minuten backen.</p>
+    <div class="quelle ein" style="--d:4">Eiweißangabe gerundet nach üblichen Nährwerttabellen</div>
+  </div>
+  <div class="karte hell ein" style="--d:2">
+    <ul class="zutaten">
+      <li><b>1 Dose</b>Kichererbsen, abgetropft</li>
+      <li><b>1</b>rote Paprika</li>
+      <li><b>1</b>Zucchini</li>
+      <li><b>1</b>rote Zwiebel</li>
+      <li><b>150 g</b>Feta</li>
+      <li><b>2 EL</b>Olivenöl</li>
+      <li><b>1 TL</b>Paprikapulver, Salz, Pfeffer</li>
+    </ul>
+  </div>
+</section>
+
+<section class="folie" data-reihe="rezept">
+  <div>
+    <div class="dach ein">Rezeptidee · eiweißreich</div>
+    <h2 class="ein" style="--d:1">Hüttenkäse-Brot mit Radieschen</h2>
+    <div class="meta ein" style="--d:2"><span>5 Minuten</span><span>1 Portion</span><span>etwa 30&nbsp;g Eiweiß</span></div>
+    <p class="ein" style="--d:3">Radieschen in dünne Scheiben schneiden, Schnittlauch fein hacken. Hüttenkäse aufs Brot streichen, Radieschen und Schnittlauch darauf, mit Pfeffer würzen.</p>
+    <div class="quelle ein" style="--d:4">Eiweißangabe gerundet nach üblichen Nährwerttabellen</div>
+  </div>
+  <div class="karte hell ein" style="--d:2">
+    <ul class="zutaten">
+      <li><b>2 Scheiben</b>Vollkornbrot</li>
+      <li><b>200 g</b>Hüttenkäse</li>
+      <li><b>5</b>Radieschen</li>
+      <li><b>1 Bund</b>Schnittlauch</li>
+      <li><b>etwas</b>Salz, Pfeffer</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ Fusszeile ============ -->
+<div class="fuss">
+  <div class="fortschritt" id="fortschritt"></div>
+  <img src="bilder/logo-negativ-weiss.svg" alt="Bewegungszentrum für Körperwohl und Squash">
+  <div class="zeit">
+    <div class="offen" id="offen"></div>
+    <div class="uhr" id="uhr"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------------- Einstellungen ----------------
+  var DAUER = 14;              // Sekunden je Folie (Kursplan hat eigene Dauer, data-dauer)
+  var NEU_LADEN_MINUTEN = 30;  // holt neue Inhalte, wenn die Seite geaendert wurde
+  var SCHALTER = {
+    gutscheine: true           // false, falls die Gutscheine nicht rechtzeitig stehen (wie GUTSCHEINE_ZEIGEN im Aushang)
+  };
+
+  // Reihenfolge eines Durchlaufs. "reihe:x" = naechste Folie aus der Themenreihe x.
+  // Abgelaufene oder noch nicht faellige Folien werden uebersprungen.
+  var ABLAUF = [
+    'kursplan', 'ersttestung', 'reihe:gesundheit', 'aufbauprogramm', 'reihe:uebung',
+    'samstag', 'checkup', 'reihe:rezept', 'squash', 'sporttherapie', 'rehasport',
+    'bewertung', 'gutscheine'
+  ];
+
+  // Oeffnungszeiten je Wochentag (0 = Sonntag)
+  var OEFFNUNG = {
+    0: null,
+    1: '8–14 und 16–22 Uhr', 2: '8–14 und 16–22 Uhr', 3: '8–14 und 16–22 Uhr',
+    4: '8–14 und 16–22 Uhr', 5: '8–14 und 16–22 Uhr',
+    6: '9–14 Uhr'
+  };
+
+  var KURSPLAN_URL = 'https://bks.virtuagym.com/classes';
+
+  // ---------------- Hilfsfunktionen ----------------
+  function parameter(name) {
+    var m = new RegExp('[?&]' + name + '=([^&]*)').exec(location.search);
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+  // Datum ohne Zeitzonen-Raetsel: immer als Ortszeit lesen
+  function datum(s) {
+    var t = s.split(/[-T:]/);
+    return new Date(+t[0], +t[1] - 1, +t[2], +(t[3] || 0), +(t[4] || 0));
+  }
+  function zwei(n) { return (n < 10 ? '0' : '') + n; }
+  function iso(d) { return d.getFullYear() + '-' + zwei(d.getMonth() + 1) + '-' + zwei(d.getDate()); }
+
+  var versatz = 0;
+  if (parameter('datum')) versatz = datum(parameter('datum')).getTime() - Date.now();
+  function jetzt() { return new Date(Date.now() + versatz); }
+
+  var tempo = parameter('tempo') ? +parameter('tempo') : 0;
+  var vorschau = !!(parameter('datum') || parameter('folie') || parameter('tempo'));
+
+  // 1rem = 1 % der Breite einer 16:9-Flaeche, die in den Bildschirm passt
+  function groesse() {
+    var u = Math.min(window.innerWidth, window.innerHeight * 16 / 9) / 100;
+    document.documentElement.style.fontSize = u + 'px';
+    kursplanSkalieren();
+  }
+
+  // ---------------- Folien ----------------
+  var alle = [].slice.call(document.querySelectorAll('.folie'));
+  var reihen = {};
+  alle.forEach(function (f) {
+    var r = f.getAttribute('data-reihe');
+    if (r) (reihen[r] = reihen[r] || []).push(f);
+  });
+
+  function sichtbar(f) {
+    var t = jetzt();
+    var ab = f.getAttribute('data-ab'), bis = f.getAttribute('data-bis'), sch = f.getAttribute('data-schalter');
+    if (sch && !SCHALTER[sch]) return false;
+    if (ab && t < datum(ab)) return false;
+    if (bis && t >= datum(bis)) return false;
+    return true;
+  }
+
+  function speicher(k, v) {
+    try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { }
+    return null;
+  }
+
+  // Naechste Folie einer Reihe; startet nach einem Neuladen dort, wo sie aufgehoert hat
+  function ausReihe(name) {
+    var liste = reihen[name] || [];
+    var start = +(speicher('bks-tv-' + name) || 0);
+    for (var i = 0; i < liste.length; i++) {
+      var n = (start + i) % liste.length;
+      if (sichtbar(liste[n])) { speicher('bks-tv-' + name, String((n + 1) % liste.length)); return liste[n]; }
+    }
+    return null;
+  }
+
+  var pos = -1, aktiv = null, timer = null;
+
+  function naechste() {
+    for (var i = 0; i < ABLAUF.length; i++) {
+      pos = (pos + 1) % ABLAUF.length;
+      var e = ABLAUF[pos], f = null;
+      if (e.indexOf('reihe:') === 0) f = ausReihe(e.slice(6));
+      else { f = document.querySelector('.folie[data-id="' + e + '"]'); if (f && !sichtbar(f)) f = null; }
+      if (f) return f;
+    }
+    return alle[0];
+  }
+
+  function zeige(f) {
+    if (aktiv && aktiv !== f) {
+      aktiv.classList.remove('aktiv');
+      if (aktiv.getAttribute('data-id') === 'kursplan') kursplanLaden(false);
+    }
+    aktiv = f;
+    f.classList.add('aktiv');
+    var s = tempo || +(f.getAttribute('data-dauer') || DAUER);
+    var bar = document.getElementById('fortschritt');
+    bar.style.transition = 'none'; bar.style.width = '0';
+    void bar.offsetWidth;
+    bar.style.transition = 'width ' + s + 's linear'; bar.style.width = '100%';
+    return s;
+  }
+
+  function weiter() {
+    var s = zeige(naechste());
+    timer = setTimeout(weiter, s * 1000);
+  }
+
+  // ---------------- Kursplan ----------------
+  // Sa ab 14 Uhr und sonntags zeigt der Plan schon die kommende Woche.
+  var kursplanZeit = 0;
+  function kursplanLaden(sofort) {
+    if (!sofort && Date.now() - kursplanZeit < 5 * 60 * 1000) return;
+    var t = jetzt(), tag = t.getDay(), naechsteWoche = (tag === 0) || (tag === 6 && t.getHours() >= 14);
+    var url = KURSPLAN_URL + '?embedded=1';
+    if (naechsteWoche) {
+      var mo = new Date(t.getFullYear(), t.getMonth(), t.getDate() + (tag === 0 ? 1 : 2));
+      url = KURSPLAN_URL + '/week/' + iso(mo) + '?embedded=1';
+    }
+    document.getElementById('kursplan-titel').textContent = naechsteWoche ? 'Kurse nächste Woche' : 'Kurse diese Woche';
+    document.getElementById('kursplan-rahmen').src = url;
+    kursplanZeit = Date.now();
+  }
+  // Virtuagym-Plan in 1200 px Breite zeichnen und auf die Karte vergroessern (passt fuer ca. 5 Zeitreihen)
+  function kursplanSkalieren() {
+    var karte = document.querySelector('.kursplan-karte'), fr = document.getElementById('kursplan-rahmen');
+    if (!karte || !fr) return;
+    var B = 1200, s = karte.clientWidth / B;
+    fr.style.width = B + 'px';
+    fr.style.height = (karte.clientHeight / s) + 'px';
+    fr.style.webkitTransform = fr.style.transform = 'scale(' + s + ')';
+  }
+
+  // ---------------- Uhr und Oeffnungszeiten ----------------
+  function uhr() {
+    var t = jetzt();
+    document.getElementById('uhr').textContent = zwei(t.getHours()) + ':' + zwei(t.getMinutes());
+    var o = OEFFNUNG[t.getDay()];
+    document.getElementById('offen').innerHTML = o ? 'Heute geöffnet<br><strong>' + o + '</strong>' : 'Heute geschlossen';
+  }
+
+  // ---------------- Neu laden, aber nur wenn erreichbar ----------------
+  var geladen = Date.now();
+  function vielleichtNeuLaden() {
+    if (vorschau || location.protocol === 'file:') return;
+    if (Date.now() - geladen < NEU_LADEN_MINUTEN * 60 * 1000) return;
+    var x = new XMLHttpRequest();
+    x.open('GET', location.pathname + '?pruefen=' + Date.now(), true);
+    x.timeout = 15000;
+    x.onload = function () { if (x.status === 200) location.reload(); };
+    x.send();
+  }
+
+  // ---------------- Start ----------------
+  window.addEventListener('resize', groesse);
+  groesse();
+  kursplanLaden(true);
+  uhr();
+  setInterval(uhr, 10 * 1000);
+  setInterval(vielleichtNeuLaden, 60 * 1000);
+  try { if (navigator.wakeLock) navigator.wakeLock.request('screen').catch(function () { }); } catch (e) { }
+
+  var fest = parameter('folie');
+  if (fest) {
+    var f = reihen[fest] ? reihen[fest][(+(parameter('nr') || 1) - 1) % reihen[fest].length]
+                         : document.querySelector('.folie[data-id="' + fest + '"]');
+    zeige(f || alle[0]);
+  } else {
+    weiter();
+  }
+})();
+</script>
+</body>
+</html>
