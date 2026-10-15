@@ -246,6 +246,27 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
 .baelle p{font-size:1.5rem;line-height:1.4;margin:0}
 .baelle p small{display:block;font-size:1.3rem;color:var(--text-3);margin-top:.3rem}
 
+/* Fuer Sie oder jemand Bekanntes: Foto ueber die halbe Flaeche bis an den Rand, Text daneben */
+.folie.v-halb{grid-template-columns:1.15fr .85fr;padding-right:0}
+.v-halb .bild{position:relative;align-self:stretch;margin:-4.2rem 0 -2.6rem 0;overflow:hidden}
+.v-halb .bild img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%;display:block}
+.folie.v-halb.links{grid-template-columns:.85fr 1.15fr;padding-right:5.5rem;padding-left:0}
+.folie.familie h2.mittel{font-size:3.2rem}
+.folie.familie .akzent{font-size:2.6rem;margin-bottom:1.4rem}
+.folie.familie p{font-size:1.65rem}
+.zeiten{display:grid;grid-template-columns:repeat(5, minmax(0, 1fr));grid-gap:.8rem;max-width:46rem;margin:.2rem 0 1.8rem}
+.zeiten div{background:var(--flaeche);border:1px solid var(--linie);border-radius:1rem;padding:1rem .6rem;text-align:center}
+.zeiten b{display:block;font-size:1.25rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--hellblau)}
+.zeiten span{display:block;font-size:1.5rem;font-weight:650;line-height:1.25;color:#fff;margin-top:.35rem}
+.v-halb.links .bild{-webkit-box-ordinal-group:0;order:-1}
+.weiter{display:-webkit-box;display:flex;align-items:center;margin-top:2.2rem;max-width:46rem;
+  background:var(--flaeche);border:1px solid var(--linie);border-radius:1.2rem;padding:1.4rem 1.8rem 1.4rem 1.4rem}
+.weiter .qrfeld{flex:0 0 auto;width:8.6rem;height:8.6rem;background:#fff;border-radius:.8rem;padding:.4rem;margin-right:1.8rem}
+.weiter .qrfeld img{width:100%;height:100%;display:block}
+.weiter b{display:block;font-size:1.75rem;line-height:1.3;color:#fff;font-weight:700}
+.weiter span{display:block;font-size:1.4rem;line-height:1.4;color:var(--text-2);margin-top:.4rem}
+.weiter span strong{color:#fff;font-weight:650}
+
 /* ---------- Fusszeile ---------- */
 .fuss{position:fixed;left:0;right:0;bottom:0;height:7.2rem;display:-webkit-box;display:flex;align-items:center;justify-content:space-between;
   padding:0 5.5rem;border-top:1px solid var(--linie);background:rgba(10,13,40,.55)}
@@ -349,7 +370,7 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
     <div class="datum-block ein"><b>28</b><div><span>November</span><em>Samstag · 10 bis 13 Uhr</em></div></div>
     <h2 class="ein" style="--d:1">Offener Samstag</h2>
     <div class="akzent ein" style="--d:2">Bringen Sie jemanden mit.</div>
-    <p class="ein" style="--d:3">Wer Squash noch nicht kennt, kann es an diesem Vormittag ausprobieren. Dazu gibt es die Trainingsfläche und eine kurze Kraftmessung.</p>
+    <p class="ein" style="--d:3">Wer Squash noch nicht kennt, kann es an diesem Vormittag ausprobieren. Und wer sich mehr für die Trainingsfläche interessiert, setzt sich an ein Gerät oder macht eine kurze Kraftmessung.</p>
     <div class="ein" style="--d:4"><span class="stempel">Eintritt frei</span><span class="klein">ohne Anmeldung</span></div>
   </div>
   <div class="kacheln">
@@ -372,6 +393,108 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
   </div>
 </section>
 
+<!-- Gutscheine: Verkauf ab 28.11., Preise bei Kauf bis 15.12. (wie im Aufenthaltsraum) -->
+<section class="folie" data-id="gutscheine" data-ab="2026-11-28T00:00" data-bis="2026-12-16T00:00" data-schalter="gutscheine">
+  <div>
+    <div class="dach ein">Zum Verschenken</div>
+    <h2 class="ein" style="--d:1">Gutscheine für Familie und Freunde</h2>
+    <div class="akzent ein" style="--d:2">Zu kaufen am Empfang.</div>
+    <p class="ein" style="--d:3">Mit dem Gutschein fängt die beschenkte Person bei uns mit einer Ersttestung an. Den Gutschein gibt es als Karte mit Umschlag.</p>
+  </div>
+  <div class="karte ein" style="--d:2">
+    <div class="preise-titel">Gutscheine</div>
+    <table class="preise">
+      <tr><td>Ersttestung</td><td class="p">59,90&nbsp;€</td></tr>
+      <tr><td>10er-Karte Gerätetraining<small>inklusive Ersttestung</small></td><td class="p">200&nbsp;€</td></tr>
+    </table>
+    <div class="merke">Beide Preise gelten bei Kauf bis 15.12.</div>
+  </div>
+</section>
+
+<!-- ================================================================
+     REIHE: FUER SIE ODER JEMAND BEKANNTES (Gesundheitstraining, Wunsch Nils 15.10.2026)
+     Squash-Spieler sollen an sich selbst oder an Bekannte denken (zuerst "Ihre Mutter /
+     Ihr Vater", auf Wunsch Nils: "Sie oder jemand Bekanntes"). Regeln: keine Heilversprechen, Studie nennen,
+     im Erstgespraech wird nicht gemessen (Vault, Erstgespraech). QR fuehrt auf
+     www.bks-bewegungszentrum.de/gesundheitstraining.
+     ================================================================ -->
+<section class="folie v-halb familie" data-reihe="familie">
+  <div>
+    <div class="dach ein">Für Sie oder jemand Bekanntes</div>
+    <h2 class="ein mittel" style="--d:1">Rücken oder Schulter machen Probleme?</h2>
+    <div class="akzent ein" style="--d:2">Kommen Sie vorbei, oder erzählen Sie es weiter.</div>
+    <p class="ein" style="--d:3">Bei uns trainieren Sie an Geräten, die genau auf Sie eingestellt werden. Während der ganzen Öffnungszeit ist ein Sporttherapeut auf der Fläche und hilft, wenn etwas nicht passt.</p>
+    <div class="weiter ein" style="--d:4">
+      <div class="qrfeld"><img src="../bilder/qr-gesundheitstraining.svg" alt=""></div>
+      <div><b>Kostenloses Erstgespräch</b><span>Rund 30 Minuten, unter <strong>07159&nbsp;45151</strong>. Code scannen und den Link speichern oder weiterschicken.</span></div>
+    </div>
+  </div>
+  <div class="bild"><img src="../bilder/schulteruebung.jpg" alt=""></div>
+</section>
+
+<section class="folie v-halb links familie" data-reihe="familie">
+  <div>
+    <div class="dach ein">Für Sie oder jemand Bekanntes</div>
+    <h2 class="ein mittel" style="--d:1">Vorbeugen, solange nichts weh&nbsp;tut?</h2>
+    <div class="akzent ein" style="--d:2">Genau dafür ist das Training da.</div>
+    <p class="ein" style="--d:3">Kraft und Gleichgewicht lassen mit den Jahren nach, wenn man nichts dafür tut. In der Ersttestung messen wir, wo Sie stehen, und bauen daraus Ihren Trainingsplan.</p>
+    <div class="weiter ein" style="--d:4">
+      <div class="qrfeld"><img src="../bilder/qr-gesundheitstraining.svg" alt=""></div>
+      <div><b>Kostenloses Erstgespräch</b><span>Rund 30 Minuten, unter <strong>07159&nbsp;45151</strong>. Code scannen und den Link speichern oder weiterschicken.</span></div>
+    </div>
+  </div>
+  <div class="bild"><img src="../bilder/seilzug-praevention.jpg" alt=""></div>
+</section>
+
+<section class="folie v-panel familie" data-reihe="familie">
+  <div>
+    <div class="dach ein">Für Sie oder jemand Bekanntes</div>
+    <h2 class="ein mittel" style="--d:1">Unsicherer auf den Beinen als früher?</h2>
+    <p class="ein" style="--d:2">Übungen für Gleichgewicht und Kraft senken bei älteren Menschen die Zahl der Stürze um fast ein Viertel. Bei uns gibt es dafür den Kurs Sturzprophylaxe.</p>
+    <div class="quelle ein" style="--d:3;margin-top:0">Cochrane-Review, Sherrington u. a., 2019</div>
+    <div class="weiter ein" style="--d:4">
+      <div class="qrfeld"><img src="../bilder/qr-gesundheitstraining.svg" alt=""></div>
+      <div><b>Kostenloses Erstgespräch</b><span>Rund 30 Minuten, unter <strong>07159&nbsp;45151</strong>. Code scannen und den Link speichern oder weiterschicken.</span></div>
+    </div>
+  </div>
+  <div class="panel ein" style="--d:2">
+    <div class="zahl"><b>−23&nbsp;%</b><span>Stürze</span></div>
+    <div class="merke">Gleichgewicht lässt sich trainieren, <strong>in jedem Alter</strong>.</div>
+  </div>
+</section>
+
+<section class="folie v-halb familie" data-reihe="familie">
+  <div>
+    <div class="dach ein">Für Sie oder jemand Bekanntes</div>
+    <h2 class="ein mittel" style="--d:1">Die Physio ist vorbei, das Knie aber noch nicht wieder das alte?</h2>
+    <div class="akzent ein" style="--d:2">Hier geht es weiter.</div>
+    <p class="ein" style="--d:3">Nach einer Operation oder Verletzung fehlt oft noch Kraft. Bei uns geht das Training begleitet weiter, auf Wunsch auch in Einzelsitzungen mit einem Sporttherapeuten.</p>
+    <div class="weiter ein" style="--d:4">
+      <div class="qrfeld"><img src="../bilder/qr-gesundheitstraining.svg" alt=""></div>
+      <div><b>Kostenloses Erstgespräch</b><span>Rund 30 Minuten, unter <strong>07159&nbsp;45151</strong>. Code scannen und den Link speichern oder weiterschicken.</span></div>
+    </div>
+  </div>
+  <div class="bild"><img src="../bilder/einzelsitzung.jpg" alt=""></div>
+</section>
+
+<!-- Rehasport-Zeiten wie Website /rehasport-in-magstadt, Stand 15.10.2026 -->
+<section class="folie v-halb links familie" data-reihe="familie">
+  <div>
+    <div class="dach ein">Für Sie oder jemand Bekanntes</div>
+    <h2 class="ein mittel" style="--d:1">Rehasport verordnet bekommen?</h2>
+    <p class="ein" style="--d:2">Den gibt es auch hier in Magstadt, in kleinen Gruppen unter fachlicher Anleitung. Mit der Verordnung und der Genehmigung der Krankenkasse geht es los.</p>
+    <div class="zeiten ein" style="--d:3">
+      <div><b>Mo</b><span>10 und 18 Uhr</span></div>
+      <div><b>Di</b><span>11 Uhr</span></div>
+      <div><b>Mi</b><span>10 Uhr</span></div>
+      <div><b>Do</b><span>10 Uhr</span></div>
+      <div><b>Fr</b><span>11 und 18 Uhr</span></div>
+    </div>
+    <div class="hinweis ein" style="--d:4">Anmeldung am Empfang oder unter 07159&nbsp;45151</div>
+  </div>
+  <div class="bild"><img src="../bilder/rehasport-gruppe.jpg" alt="" style="object-position:38% 40%"></div>
+</section>
+
 <!-- ================================================================
      REIHE: ANALYSE (Taktik und Schlaege, Court-Animation rechts)
      ================================================================ -->
@@ -390,8 +513,8 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
 
 <section class="folie v-court" data-reihe="analyse">
   <div>
-    <div class="dach ein">Schlagtechnik · Längs</div>
-    <h2 class="ein" style="--d:1">Längs an der Wand</h2>
+    <div class="dach ein">Schlagtechnik · Longline</div>
+    <h2 class="ein" style="--d:1">Die Longline: dicht an der Wand</h2>
     <p class="ein" style="--d:2">Der Ball fliegt dicht an der Seitenwand nach hinten, springt hinter dem Aufschlagfeld auf und bleibt in der Ecke hängen. Ihr Gegner muss weit nach hinten.</p>
     <div class="fehler ein" style="--d:3"><strong>Zu lang gespielt,</strong> prallt der Ball von der Rückwand ab und kommt zurück in die Mitte.</div>
   </div>
@@ -569,10 +692,10 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
 <section class="folie v-drill" data-reihe="uebung">
   <div>
     <div class="dach ein">Übung zu zweit</div>
-    <h2 class="ein" style="--d:1">Boast und Längs</h2>
+    <h2 class="ein" style="--d:1">Boast und Longline</h2>
     <ol class="schritte">
       <li class="ein" style="--d:2">A spielt hinten einen Boast</li>
-      <li class="ein" style="--d:3">B läuft nach vorn und spielt längs an der Wand</li>
+      <li class="ein" style="--d:3">B läuft nach vorn und spielt eine Longline</li>
       <li class="ein" style="--d:4">A spielt von dort wieder Boast<small>so wechseln beide ständig die Seite</small></li>
     </ol>
   </div>
@@ -592,9 +715,9 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
 <section class="folie v-drill" data-reihe="uebung">
   <div>
     <div class="dach ein">Übung zu zweit</div>
-    <h2 class="ein" style="--d:1">Längs im Wechsel</h2>
+    <h2 class="ein" style="--d:1">Longlines im Wechsel</h2>
     <ol class="schritte">
-      <li class="ein" style="--d:2">Beide spielen auf einer Seite<small>abwechselnd längs an der Wand</small></li>
+      <li class="ein" style="--d:2">Beide spielen auf einer Seite<small>abwechselnd Longlines</small></li>
       <li class="ein" style="--d:3">Nach jedem Schlag Platz machen, Richtung T</li>
       <li class="ein" style="--d:4">Ziel: Aufsprung hinter dem Aufschlagfeld</li>
     </ol>
@@ -618,7 +741,7 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
     <h2 class="ein" style="--d:1">Aufschlag und Return</h2>
     <ol class="schritte">
       <li class="ein" style="--d:2">A schlägt zehnmal von rechts auf</li>
-      <li class="ein" style="--d:3">B spielt jeden Return längs an der Wand</li>
+      <li class="ein" style="--d:3">B spielt jeden Return als Longline</li>
       <li class="ein" style="--d:4">Dann zehnmal von links</li>
     </ol>
   </div>
@@ -658,14 +781,18 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
   var LESEN = { grund: 6, jeWort: 0.4, min: 20, max: 45 };
   var AUFLOESUNG_ANTEIL = 0.48;
   var NEU_LADEN_MINUTEN = 30;
-  var SCHALTER = {};
+  var SCHALTER = {
+    gutscheine: true           // false, falls die Gutscheine nicht rechtzeitig stehen (wie im Aufenthaltsraum)
+  };
 
   // Reihenfolge eines Durchlaufs. "reihe:x" = naechste Folie aus der Themenreihe x.
   // Gemischt, damit aehnliche Aufbauten nicht aufeinander folgen.
+  // Offener Samstag zweimal pro Durchlauf (Wunsch Nils 15.10.), solange er ansteht.
   var ABLAUF = [
-    'preise', 'reihe:analyse', 'reihe:regel', 'wellpass', 'reihe:analyse', 'reihe:uebung',
-    'ersttestung', 'reihe:regel', 'reihe:analyse', 'ausruestung', 'reihe:uebung', 'samstag',
-    'reihe:regel', 'ball', 'bewertung'
+    'preise', 'reihe:analyse', 'reihe:familie', 'reihe:regel', 'samstag', 'reihe:analyse',
+    'reihe:uebung', 'wellpass', 'reihe:familie', 'reihe:regel', 'ersttestung', 'reihe:analyse',
+    'ausruestung', 'samstag', 'reihe:uebung', 'gutscheine', 'reihe:regel', 'ball',
+    'reihe:familie', 'bewertung'
   ];
 
   // Oeffnungszeiten je Wochentag (0 = Sonntag)
