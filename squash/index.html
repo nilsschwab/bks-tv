@@ -1,0 +1,1094 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>BKS Fernseher Squash</title>
+<!--
+  Slides fuer den Fernseher im Squashbereich.
+
+  Gleicher Stil und gleicher Ablauf wie die Slides im Aufenthaltsraum (../index.html):
+  Folienwechsel von selbst, Neuladen alle 30 Minuten (nur wenn der Server antwortet),
+  Folien mit data-ab / data-bis erscheinen und verschwinden zum Datum von selbst,
+  Folien mit data-reihe bilden Themenreihen.
+
+  Neu hier: Court-Animationen. Ein <svg class="court" data-szene="..."> wird per Skript
+  gezeichnet; die Szenen stehen unten in SZENEN. Koordinaten in Zentimetern auf dem Court
+  von oben: x = 0 linke Seitenwand bis 640 rechte Seitenwand, y = 0 Vorderwand bis 975
+  Rueckwand (Masse nach World Squash). Regelfolien (v-quiz) zeigen erst die Frage und loesen
+  nach knapp der Haelfte der Anzeigedauer auf.
+
+  Testen im Browser:
+    ?folie=preise              nur diese Folie
+    ?folie=analyse&nr=4        vierte Folie der Reihe "analyse"
+    ?zeit=4.5                  Court-Animation bei 4,5 Sekunden anhalten (?zeit=ende: Endbild)
+    ?aufgeloest=1              Regelfrage gleich mit Aufloesung zeigen
+    ?datum=2026-11-30T10:00    so tun, als waere es dieser Zeitpunkt
+    ?tempo=4                   4 Sekunden je Folie
+
+  Schrift: alles in rem, 1rem = 1 % der Breite einer 16:9-Flaeche. Skript bewusst in ES5.
+-->
+<link rel="stylesheet" href="../schriften.css">
+<style>
+:root{
+  --grund:   #0f1438;
+  --grund-2: #1a2260;
+  --indigo:  #3D4BA7;   /* Logofarbe */
+  --hellblau:#5894D5;   /* Logofarbe */
+  --hell:    #e8eeff;
+  --text-2:  rgba(232,238,255,.82);
+  --text-3:  rgba(232,238,255,.58);
+  --flaeche: rgba(255,255,255,.065);
+  --linie:   rgba(255,255,255,.14);
+  --papier:  #ffffff;
+  --tinte:   #111318;
+}
+html{font-size:1vw}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--grund);color:#fff;cursor:none}
+body{font-family:'Inter',system-ui,sans-serif;font-synthesis:none;-webkit-font-smoothing:antialiased;
+  font-feature-settings:"tnum" 0, "cv11" 1}
+*{box-sizing:border-box}
+
+#buehne{position:fixed;top:0;right:0;bottom:0;left:0;
+  background:
+    radial-gradient(70rem 40rem at 88% -8%, rgba(88,148,213,.22), transparent 70%),
+    radial-gradient(60rem 36rem at -10% 110%, rgba(61,75,167,.35), transparent 70%),
+    linear-gradient(160deg, var(--grund-2), var(--grund) 72%)}
+
+/* ---------- Folien (wie im Aufenthaltsraum) ---------- */
+.folie{position:absolute;top:0;left:0;right:0;bottom:7.2rem;
+  padding:4.2rem 5.5rem 2.6rem;display:grid;grid-template-columns:1.12fr 1fr;grid-gap:4.5rem;
+  align-items:center;opacity:0;visibility:hidden;transition:opacity .9s ease, visibility 0s linear .9s}
+.folie.aktiv{opacity:1;visibility:visible;transition:opacity .9s ease, visibility 0s}
+
+.folie .ein{opacity:0;transform:translateY(1.2rem)}
+.folie.aktiv .ein{animation:rein .8s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--d, 0) * 90ms + 150ms)}
+@keyframes rein{from{opacity:0;transform:translateY(1.2rem)}to{opacity:1;transform:none}}
+
+.dach{font-size:1.3rem;font-weight:650;letter-spacing:.14em;text-transform:uppercase;color:var(--hellblau);margin:0 0 1.6rem}
+h2{font-size:4.1rem;line-height:1.07;font-weight:720;letter-spacing:-.015em;margin:0 0 1.4rem;color:#fff}
+h2.mittel{font-size:3.5rem}
+h2.frage{font-size:3.1rem;line-height:1.16;font-weight:700}
+.akzent{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;font-size:3.1rem;line-height:1.15;color:var(--hell);margin:0 0 1.8rem}
+p{font-size:1.75rem;line-height:1.48;color:var(--text-2);margin:0 0 1.5rem;max-width:46rem}
+p strong{color:#fff;font-weight:650}
+.hinweis{display:inline-block;font-size:1.6rem;font-weight:600;color:#fff;padding:1rem 1.5rem;border-radius:.8rem;
+  background:rgba(88,148,213,.16);border:1px solid rgba(88,148,213,.45);margin-top:.6rem}
+.quelle{font-size:1.1rem;color:var(--text-3);margin-top:1.6rem;line-height:1.4}
+.klein{font-size:1.25rem;color:var(--text-3);line-height:1.4}
+
+.karte{background:var(--flaeche);border:1px solid var(--linie);border-radius:1.6rem;padding:2.6rem 2.8rem}
+.karte.hell{background:var(--papier);color:var(--tinte);border:0}
+
+.zahl b{display:block;font-size:12rem;line-height:.95;font-weight:780;letter-spacing:-.04em;color:var(--hellblau)}
+.zahl span{display:block;font-size:2rem;color:var(--hell);margin-top:1.2rem;font-weight:500}
+.merke{margin-top:2.4rem;padding-top:1.8rem;border-top:1px solid var(--linie);font-size:1.6rem;line-height:1.45;color:var(--text-2)}
+.merke strong{color:#fff}
+
+.preise{width:100%;border-collapse:collapse}
+.preise th{font-size:1.15rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);text-align:right;padding:0 0 1rem 1.5rem}
+.preise th:first-child{text-align:left;padding-left:0}
+.preise td{font-size:1.7rem;padding:1.15rem 0;border-top:1px solid var(--linie);color:var(--text-2);vertical-align:baseline}
+.preise td.p{text-align:right;color:#fff;font-weight:650;white-space:nowrap;padding-left:1.5rem;font-feature-settings:"tnum" 1}
+.preise td small{display:block;font-size:1.2rem;color:var(--text-3);margin-top:.25rem}
+.preise-titel{font-size:1.3rem;font-weight:650;letter-spacing:.12em;text-transform:uppercase;color:var(--hellblau);margin:0 0 1.4rem}
+
+.schritte{list-style:none;margin:0;padding:0;counter-reset:s}
+.schritte li{counter-increment:s;position:relative;padding:1.7rem 1.8rem 1.7rem 6.4rem;margin-bottom:1.2rem;
+  background:var(--flaeche);border:1px solid var(--linie);border-radius:1.2rem;font-size:1.8rem;line-height:1.4;color:#fff}
+.schritte li:before{content:counter(s);position:absolute;left:1.8rem;top:50%;margin-top:-1.7rem;width:3.4rem;height:3.4rem;border-radius:50%;
+  background:var(--hellblau);color:var(--grund);font-weight:750;font-size:1.7rem;line-height:3.4rem;text-align:center}
+.schritte li small{display:block;font-size:1.35rem;color:var(--text-2);margin-top:.35rem;font-weight:400}
+.fehler{margin-top:1.8rem;font-size:1.55rem;line-height:1.45;color:var(--text-2);padding-left:1.4rem;border-left:.35rem solid #e08a5b;max-width:46rem}
+.fehler strong{color:#fff}
+.fehler.tipp{border-left-color:var(--hellblau)}
+
+.kacheln .kachel{display:-webkit-box;display:flex;margin-bottom:1.3rem;background:var(--flaeche);border:1px solid var(--linie);border-radius:1.2rem;padding:1.8rem 2rem}
+.kachel .nr{flex:0 0 auto;width:3.6rem;height:3.6rem;border-radius:50%;border:2px solid var(--hellblau);color:var(--hellblau);
+  font-weight:750;font-size:1.7rem;line-height:3.3rem;text-align:center;margin-right:1.8rem}
+.kachel h3{margin:0 0 .4rem;font-size:2rem;font-weight:680;color:#fff}
+.kachel p{margin:0;font-size:1.45rem;line-height:1.42}
+.stempel{display:inline-block;font-size:1.7rem;font-weight:700;color:var(--grund);background:var(--hell);padding:.9rem 1.5rem;border-radius:.8rem;margin-right:1rem}
+
+.qr{display:-webkit-box;display:flex;flex-direction:column;align-items:center;text-align:center}
+.qr img{width:27rem;height:27rem;display:block}
+.qr .unter{font-size:1.7rem;font-weight:650;color:var(--tinte);margin-top:1.4rem}
+
+/* ---------- Varianten aus dem Aufenthaltsraum ---------- */
+.v-foto .hintergrund{position:absolute;top:0;left:0;right:0;bottom:-7.2rem;z-index:0;overflow:hidden}
+.v-foto .hintergrund img{width:100%;height:100%;object-fit:cover;display:block}
+.v-foto .hintergrund:after{content:"";position:absolute;top:0;left:0;right:0;bottom:0;
+  background:linear-gradient(90deg, rgba(13,17,48,.97) 0%, rgba(13,17,48,.9) 40%, rgba(13,17,48,.35) 70%, rgba(13,17,48,.1) 100%)}
+.v-foto > div:not(.hintergrund){position:relative;z-index:1}
+
+.folie.v-panel{grid-template-columns:.95fr 1.05fr;padding-left:0}
+.v-panel > .panel{-webkit-box-ordinal-group:0;order:-1;align-self:stretch;margin:-4.2rem 0 -2.6rem 0;padding:4rem 4rem 4rem 5.5rem;
+  background:var(--hellblau);display:-webkit-box;display:flex;-webkit-box-orient:vertical;flex-direction:column;justify-content:center}
+.panel .zahl b{color:var(--grund);font-size:13rem}
+.panel .zahl span{color:var(--grund);font-weight:600}
+.panel .merke{color:rgba(15,20,56,.85);border-top-color:rgba(15,20,56,.25)}
+.panel .merke strong{color:var(--grund)}
+
+.folie.v-reihe{display:-webkit-box;display:flex;-webkit-box-orient:vertical;flex-direction:column;justify-content:center;align-items:stretch;grid-gap:0;gap:0}
+.v-reihe > div:first-child{display:grid;grid-template-columns:1.25fr 1fr;grid-column-gap:4.5rem;align-items:end;margin-bottom:3.2rem}
+.v-reihe > div:first-child > .dach,.v-reihe > div:first-child > h2{grid-column:1 / -1}
+.v-reihe > div:first-child > p,.v-reihe > div:first-child > .fehler{margin:0}
+
+.datum-block{display:-webkit-inline-box;display:inline-flex;align-items:center;background:var(--hellblau);color:var(--grund);
+  border-radius:1.4rem;padding:1.2rem 2.2rem 1.2rem 1.8rem;margin-bottom:2.2rem}
+.datum-block b{font-size:6.8rem;font-weight:800;line-height:.9;letter-spacing:-.03em;margin-right:1.4rem}
+.datum-block span{display:block;font-size:2.1rem;font-weight:720;line-height:1.15}
+.datum-block em{display:block;font-style:normal;font-size:1.25rem;font-weight:650;letter-spacing:.08em;text-transform:uppercase;margin-top:.35rem}
+
+.folie.v-hell{background:linear-gradient(160deg, #f1f4fd 0%, #dfe6f8 100%)}
+.v-hell .dach{color:var(--indigo)}
+.v-hell h2{color:var(--grund)}
+.v-hell p{color:#3b4272}
+.v-hell .karte.hell{background:var(--indigo);color:#fff;box-shadow:0 2rem 4rem rgba(29,36,96,.25)}
+.v-hell .preise-titel{color:#c9dbff}
+.liste{list-style:none;margin:0;padding:0}
+.liste li{font-size:2.1rem;font-weight:600;line-height:1.3;padding:1.2rem 0;border-top:1px solid rgba(255,255,255,.16);color:#fff}
+.liste li:first-child{border-top:0}
+.liste li small{display:block;font-size:1.35rem;font-weight:400;color:#c9dbff;margin-top:.2rem}
+
+/* ================= Neu fuer den Squashbereich ================= */
+
+/* Court-Folie: Text links, Court rechts */
+.folie.v-court{grid-template-columns:1fr auto;grid-gap:6rem}
+/* Regelfrage: Court links, Frage und Aufloesung rechts */
+.folie.v-quiz{grid-template-columns:auto 1fr;grid-gap:5.5rem}
+/* Uebung zu zweit: Schritte links, Court in der Mitte, worauf achten rechts */
+.folie.v-drill{grid-template-columns:1.15fr auto .75fr;grid-gap:3.8rem}
+
+.court-box{text-align:center}
+svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
+.legende{margin-top:.9rem;font-size:1.25rem;color:var(--text-2);white-space:nowrap}
+.legende i{display:inline-block;width:2rem;height:2rem;border-radius:50%;font-style:normal;font-weight:750;font-size:1.05rem;line-height:1.75rem;
+  color:#fff;text-align:center;margin:0 .45rem 0 1.4rem;vertical-align:middle;border:2px solid #fff}
+.legende i:first-child{margin-left:0}
+.legende i.a{background:var(--indigo)}
+.legende i.b{background:#2b3050}
+.legende i.auf{background:transparent;border-color:var(--hellblau);width:1.6rem;height:1.6rem}
+
+/* Court in SVG-Einheiten (1 = 1 cm) */
+.court text{font-family:'Inter',system-ui,sans-serif}
+.court .boden{fill:#ecdfc6}
+.court .diele{stroke:rgba(120,85,40,.08);stroke-width:2}
+.court .linie{stroke:#c8372d;stroke-width:5}
+.court .wand{fill:none;stroke:#f3f5fb;stroke-width:16}
+.court .wand-text{fill:rgba(232,238,255,.7);font-size:26px;font-weight:650;letter-spacing:.16em;text-transform:uppercase}
+.court .zone{fill:rgba(88,148,213,.24);stroke:#3D4BA7;stroke-width:3;stroke-dasharray:10 8}
+.court .zone.box{fill:rgba(88,148,213,.32);stroke:none}
+.court .spur{fill:none;stroke-width:7;stroke-linejoin:round;stroke-linecap:round}
+.court .spur-A{stroke:#3D4BA7}
+.court .spur-B{stroke:#2b3050}
+.court .weg{fill:none;stroke-width:6;stroke-dasharray:1 13;stroke-linecap:round;stroke-linejoin:round}
+.court .weg-A{stroke:#3D4BA7}
+.court .weg-B{stroke:#2b3050}
+.court .geist{fill:none;stroke:#3D4BA7;stroke-width:5;stroke-dasharray:14 11;opacity:0;transition:opacity .6s}
+.court .geist.falsch{stroke:#c8372d}
+.court .hilfe line{stroke:#5894D5;stroke-width:4;stroke-dasharray:12 10}
+.court .hilfe,.court .notiz{opacity:0;transition:opacity .6s}
+.court .notiz{fill:#1d2140;font-size:30px;font-weight:650;paint-order:stroke;stroke:#ecdfc6;stroke-width:9;stroke-linejoin:round}
+.court .m-w{fill:#fff;stroke:#3D4BA7;stroke-width:5}
+.court .m-b{fill:none;stroke:#3D4BA7;stroke-width:4}
+.court .m-x{fill:rgba(200,55,45,.16);stroke:#c8372d;stroke-width:6}
+.court .ball{fill:#111318;stroke:#fff;stroke-width:3}
+.court .sp circle{stroke:#fff;stroke-width:4}
+.court .sp-A circle{fill:#3D4BA7}
+.court .sp-B circle{fill:#2b3050}
+.court .sp text{fill:#fff;font-size:32px;font-weight:750}
+
+/* Regelfrage */
+.wahl{margin:2.2rem 0 0}
+.wahl span{display:inline-block;font-size:1.7rem;font-weight:650;color:#fff;border:2px solid rgba(255,255,255,.35);border-radius:3rem;
+  padding:.7rem 1.6rem;margin:0 .8rem .9rem 0;transition:opacity .6s, background-color .6s, color .6s, border-color .6s}
+.folie.aufgeloest .wahl span{opacity:.3}
+.folie.aufgeloest .wahl span.richtig{opacity:1;background:var(--hellblau);border-color:var(--hellblau);color:var(--grund)}
+.gleich{font-size:1.35rem;color:var(--text-3);margin-top:.4rem}
+.folie.aufgeloest .gleich{display:none}
+.aufloesung{margin-top:1.4rem;padding:1.7rem 2.1rem;border-radius:1.2rem;background:rgba(88,148,213,.16);border:1px solid rgba(88,148,213,.5);
+  font-size:1.7rem;line-height:1.45;color:var(--text-2);max-width:50rem;opacity:0}
+.aufloesung b{color:#fff;font-weight:700}
+.aufloesung .quelle{margin-top:.9rem}
+.aufloesung ul{list-style:none;margin:0;padding:0}
+.aufloesung li{padding:.35rem 0}
+.folie.aktiv.aufgeloest .aufloesung{animation:rein .8s cubic-bezier(.2,.7,.2,1) both}
+
+/* Uebung zu zweit */
+.v-drill h2{font-size:3.6rem}
+.v-drill .schritte li,.schritte.kompakt li{font-size:1.6rem;padding:1.3rem 1.4rem 1.3rem 5.4rem;margin-bottom:1rem}
+.v-drill .schritte li:before,.schritte.kompakt li:before{left:1.4rem;width:3rem;height:3rem;line-height:3rem;margin-top:-1.5rem;font-size:1.5rem}
+.v-drill .schritte li small,.schritte.kompakt li small{font-size:1.3rem}
+.achten ul{list-style:none;margin:0;padding:0}
+.achten li{position:relative;font-size:1.6rem;line-height:1.4;color:#fff;padding:1.1rem 0 1.1rem 2.4rem;border-top:1px solid var(--linie)}
+.achten li:first-child{border-top:0;padding-top:0}
+.achten li:before{content:"";position:absolute;left:0;top:1.65rem;width:1rem;height:1rem;border-radius:50%;background:var(--hellblau)}
+.achten li:first-child:before{top:.55rem}
+.karte.achten{padding:2.4rem 2.4rem}
+
+/* Zaehlweise: drei grosse Zahlen */
+.zahlen{display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));grid-gap:1.8rem}
+.zahlen div{background:var(--flaeche);border:1px solid var(--linie);border-radius:1.4rem;padding:2.4rem 2.6rem 2.6rem}
+.zahlen b{display:block;font-size:8.5rem;line-height:1;font-weight:780;letter-spacing:-.03em;color:var(--hellblau);font-feature-settings:"tnum" 1}
+.zahlen span{display:block;font-size:1.75rem;line-height:1.38;color:#fff;margin-top:1.3rem}
+
+/* Squashbaelle */
+.baelle{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));grid-gap:1.6rem}
+.baelle > div{background:var(--flaeche);border:1px solid var(--linie);border-radius:1.4rem;padding:2.2rem 2.2rem 2.4rem}
+.ballbild{position:relative;width:7rem;height:7rem;border-radius:50%;margin-bottom:1.7rem;
+  background:radial-gradient(circle at 35% 30%, #505566, #111318 68%);box-shadow:0 1rem 2rem rgba(0,0,0,.35)}
+.ballbild i{position:absolute;top:2.8rem;left:2.8rem;width:1.4rem;height:1.4rem;border-radius:50%}
+.ballbild i.l{left:1.7rem}
+.ballbild i.r{left:3.9rem}
+.baelle h3{margin:0 0 .5rem;font-size:2.1rem;font-weight:700;color:#fff}
+.baelle p{font-size:1.5rem;line-height:1.4;margin:0}
+.baelle p small{display:block;font-size:1.3rem;color:var(--text-3);margin-top:.3rem}
+
+/* ---------- Fusszeile ---------- */
+.fuss{position:fixed;left:0;right:0;bottom:0;height:7.2rem;display:-webkit-box;display:flex;align-items:center;justify-content:space-between;
+  padding:0 5.5rem;border-top:1px solid var(--linie);background:rgba(10,13,40,.55)}
+.fuss img{height:3.6rem;display:block}
+.fuss .buchen{font-size:1.45rem;color:var(--text-2)}
+.fuss .buchen strong{color:#fff;font-weight:650}
+.fuss .zeit{display:-webkit-box;display:flex;align-items:center}
+.fuss .offen{font-size:1.4rem;color:var(--text-2);margin-right:2.6rem;text-align:right;line-height:1.35}
+.fuss .offen strong{color:#fff;font-weight:600}
+.fuss .uhr{font-size:2.9rem;font-weight:650;letter-spacing:-.01em;font-feature-settings:"tnum" 1;color:#fff}
+.fortschritt{position:absolute;left:0;top:-1px;height:3px;width:0;background:var(--hellblau)}
+</style>
+</head>
+<body>
+<div id="buehne">
+
+<!-- ================================================================
+     INFOS. Preise und Zeiten aus dem Vault (Squash-Vermietung, eGym-Wellpass,
+     Shop-Kleingeraete), Buchungshinweis wie auf der Website /squash. Stand 15.10.2026.
+     ================================================================ -->
+<section class="folie v-foto" data-id="preise">
+  <div>
+    <div class="dach ein">Squash</div>
+    <h2 class="ein" style="--d:1">Gleich den nächsten Court buchen</h2>
+    <p class="ein" style="--d:2">Am Empfang, telefonisch unter 07159&nbsp;45151 oder online. Dienstag bis Donnerstag ab 18 Uhr lohnt es sich, ein paar Tage vorher zu reservieren.</p>
+    <table class="preise ein" style="--d:3;max-width:46rem">
+      <tr><th>30 Minuten Court</th><th></th></tr>
+      <tr><td>Mo–Fr 8 bis 13:30 Uhr<small>und 16 bis 17 Uhr</small></td><td class="p">9&nbsp;€</td></tr>
+      <tr><td>Mo–Fr 17 bis 21:30 Uhr</td><td class="p">15&nbsp;€</td></tr>
+      <tr><td>Samstag 9 bis 13:30 Uhr</td><td class="p">12&nbsp;€</td></tr>
+    </table>
+    <div class="quelle ein" style="--d:4;font-size:1.4rem;color:var(--text-2)">Vormittags ist meist kurzfristig ein Court frei.</div>
+  </div>
+  <div class="hintergrund"><img src="../bilder/squash-court.jpg" alt=""></div>
+</section>
+
+<section class="folie v-panel" data-id="wellpass">
+  <div>
+    <div class="dach ein">Wellpass</div>
+    <h2 class="ein" style="--d:1">Mit Wellpass auf den Court</h2>
+    <p class="ein" style="--d:2">Wellpass-Mitglieder spielen bei uns auch Squash. Den Court buchen Sie wie gewohnt am Empfang, telefonisch oder online.</p>
+  </div>
+  <div class="panel ein" style="--d:2">
+    <div class="zahl"><b>30</b><span>Minuten Spielzeit je Check-in</span></div>
+    <div class="merke">Egal zu welcher Uhrzeit.</div>
+  </div>
+</section>
+
+<section class="folie v-hell" data-id="ausruestung">
+  <div>
+    <div class="dach ein">Am Empfang</div>
+    <h2 class="ein" style="--d:1">Griffband durch? Ball kaputt?</h2>
+    <p class="ein" style="--d:2">Griffbänder, Bälle und Schläger gibt es bei uns am Empfang zu kaufen. Etwas zu trinken für danach auch.</p>
+  </div>
+  <div class="karte hell ein" style="--d:2">
+    <div class="preise-titel">Zu kaufen am Empfang</div>
+    <ul class="liste">
+      <li>Griffbänder</li>
+      <li>Squashbälle</li>
+      <li>Squashschläger</li>
+      <li>Getränke</li>
+    </ul>
+  </div>
+</section>
+
+<section class="folie v-reihe" data-id="ball">
+  <div>
+    <div class="dach ein">Gut zu wissen · Squashbälle</div>
+    <h2 class="ein" style="--d:1">Welcher Ball passt zu Ihnen?</h2>
+    <p class="ein" style="--d:2">Die Punkte auf dem Ball zeigen, wie stark er springt. Je weniger er springt, desto schneller müssen Sie am Ball sein.</p>
+    <div class="fehler tipp ein" style="--d:3"><strong>Übrigens:</strong> Ein kalter Ball springt kaum. Nach ein paar Minuten Spiel ist er warm.</div>
+  </div>
+  <div class="baelle">
+    <div class="ein" style="--d:2"><div class="ballbild"><i class="l" style="background:#f2c418"></i><i class="r" style="background:#f2c418"></i></div><h3>Doppelt gelb</h3><p>springt am wenigsten<small>für geübte Spieler</small></p></div>
+    <div class="ein" style="--d:3"><div class="ballbild"><i style="background:#f2c418"></i></div><h3>Einfach gelb</h3><p>springt etwas mehr</p></div>
+    <div class="ein" style="--d:4"><div class="ballbild"><i style="background:#e0453a"></i></div><h3>Rot</h3><p>springt deutlich mehr<small>für Freizeitspieler</small></p></div>
+    <div class="ein" style="--d:5"><div class="ballbild"><i style="background:#3f8fe0"></i></div><h3>Blau</h3><p>springt am meisten<small>für den Einstieg</small></p></div>
+  </div>
+</section>
+
+<!-- Ersttestung-Aktion: Termine bis 15.12. (Vault, Ersttestung-Aktion). "links und rechts im
+     Vergleich" wie bei der Kurzmessung am Offenen Samstag (VALD). -->
+<section class="folie" data-id="ersttestung" data-bis="2026-12-16T00:00">
+  <div>
+    <div class="dach ein">Aktion bis 15. Dezember</div>
+    <h2 class="ein mittel" style="--d:1">Beim Squash arbeitet eine Seite mehr.</h2>
+    <div class="akzent ein" style="--d:2">Wie groß ist der Unterschied bei Ihnen?</div>
+    <p class="ein" style="--d:3">In der Ersttestung messen wir Kraft, Beweglichkeit und Gleichgewicht, links und rechts im Vergleich. Die Ergebnisse besprechen wir mit Ihnen, einen Ausdruck gibt es zum Mitnehmen.</p>
+    <div class="hinweis ein" style="--d:4">Termine am Empfang oder unter 07159&nbsp;45151</div>
+  </div>
+  <div class="karte ein" style="--d:2">
+    <div class="preise-titel">Ersttestung</div>
+    <div class="zahl"><b>59,90&nbsp;€</b><span>statt <s>80&nbsp;€</s></span></div>
+    <div class="merke">Dauer rund <strong>45 Minuten</strong>, mit Besprechung der Ergebnisse.</div>
+  </div>
+</section>
+
+<!-- Offener Samstag bis 28.11., 13 Uhr. Wie im Aufenthaltsraum ohne Preise neben "Eintritt frei". -->
+<section class="folie" data-id="samstag" data-bis="2026-11-28T13:00">
+  <div>
+    <div class="datum-block ein"><b>28</b><div><span>November</span><em>Samstag · 10 bis 13 Uhr</em></div></div>
+    <h2 class="ein" style="--d:1">Offener Samstag</h2>
+    <div class="akzent ein" style="--d:2">Bringen Sie jemanden mit.</div>
+    <p class="ein" style="--d:3">Wer Squash noch nicht kennt, kann es an diesem Vormittag ausprobieren. Dazu gibt es die Trainingsfläche und eine kurze Kraftmessung.</p>
+    <div class="ein" style="--d:4"><span class="stempel">Eintritt frei</span><span class="klein">ohne Anmeldung</span></div>
+  </div>
+  <div class="kacheln">
+    <div class="kachel ein" style="--d:2"><div class="nr">1</div><div><h3>Squash ausprobieren</h3><p>Schläger und Bälle stellen wir. Nach einer kurzen Einweisung geht es los.</p></div></div>
+    <div class="kachel ein" style="--d:3"><div class="nr">2</div><div><h3>Kurzmessung der Beinkraft</h3><p>Im Sitzen, links und rechts im Vergleich. Das Ergebnis gibt es auf einer Karte zum Mitnehmen.</p></div></div>
+    <div class="kachel ein" style="--d:4"><div class="nr">3</div><div><h3>Trainingsfläche kennenlernen</h3><p>Kurz an ein Gerät setzen und ausprobieren, mit leichtem Gewicht und mit einem von uns daneben.</p></div></div>
+  </div>
+</section>
+
+<section class="folie" data-id="bewertung">
+  <div>
+    <div class="dach ein">Ihre Rückmeldung auf Google</div>
+    <h2 class="ein" style="--d:1">Was andere über uns lesen, schreiben Sie.</h2>
+    <p class="ein" style="--d:2">Wer einen Squash-Court in der Nähe sucht, liest zuerst, was andere hier geschrieben haben. Ein paar Sätze von Ihnen helfen bei der Entscheidung.</p>
+    <p class="ein klein" style="--d:3;font-size:1.45rem">Wir lesen jede Rückmeldung und antworten auf jede. Ganz freiwillig – und wenn Ihnen etwas nicht gefällt, schreiben Sie es bitte ebenso offen oder sprechen Sie uns direkt an.</p>
+  </div>
+  <div class="karte hell qr ein" style="--d:2">
+    <img src="../bilder/qr-bewertung.svg" alt="QR-Code zur Google-Bewertung">
+    <div class="unter">Code scannen und Ihre Erfahrung schildern</div>
+  </div>
+</section>
+
+<!-- ================================================================
+     REIHE: ANALYSE (Taktik und Schlaege, Court-Animation rechts)
+     ================================================================ -->
+<section class="folie v-court" data-reihe="analyse">
+  <div>
+    <div class="dach ein">Taktik · Das T</div>
+    <h2 class="ein" style="--d:1">Nach jedem Schlag zurück aufs&nbsp;T</h2>
+    <p class="ein" style="--d:2">Vom T aus erreichen Sie alle vier Ecken mit wenigen Schritten. Wer nach dem Schlag stehen bleibt, überlässt seinem Gegner den ganzen Court.</p>
+    <div class="fehler ein" style="--d:3"><strong>Häufiger Fehler:</strong> dem eigenen Ball hinterherschauen, statt zurückzugehen.</div>
+  </div>
+  <div class="court-box ein" style="--d:1">
+    <svg class="court" data-szene="t"></svg>
+    <div class="legende"><i class="a">A</i>Sie</div>
+  </div>
+</section>
+
+<section class="folie v-court" data-reihe="analyse">
+  <div>
+    <div class="dach ein">Schlagtechnik · Längs</div>
+    <h2 class="ein" style="--d:1">Längs an der Wand</h2>
+    <p class="ein" style="--d:2">Der Ball fliegt dicht an der Seitenwand nach hinten, springt hinter dem Aufschlagfeld auf und bleibt in der Ecke hängen. Ihr Gegner muss weit nach hinten.</p>
+    <div class="fehler ein" style="--d:3"><strong>Zu lang gespielt,</strong> prallt der Ball von der Rückwand ab und kommt zurück in die Mitte.</div>
+  </div>
+  <div class="court-box ein" style="--d:1">
+    <svg class="court" data-szene="laengs"></svg>
+    <div class="legende"><i class="a">A</i>Sie <i class="b">B</i>Ihr Gegner <i class="auf"></i>Aufsprung</div>
+  </div>
+</section>
+
+<section class="folie v-court" data-reihe="analyse">
+  <div>
+    <div class="dach ein">Schlagtechnik · Cross</div>
+    <h2 class="ein" style="--d:1">Der Cross braucht Breite</h2>
+    <p class="ein" style="--d:2">Ein guter Cross trifft die Seitenwand etwa auf Höhe Ihres Gegners. So kommt er nicht mit dem Volley dazwischen, und der Ball läuft nach hinten in die Ecke.</p>
+    <div class="fehler ein" style="--d:3"><strong>Zu mittig gespielt</strong> (rote Linie), landet der Ball direkt auf dem Schläger Ihres Gegners.</div>
+  </div>
+  <div class="court-box ein" style="--d:1">
+    <svg class="court" data-szene="cross"></svg>
+    <div class="legende"><i class="a">A</i>Sie <i class="b">B</i>Ihr Gegner <i class="auf"></i>Aufsprung</div>
+  </div>
+</section>
+
+<section class="folie v-court" data-reihe="analyse">
+  <div>
+    <div class="dach ein">Schlagtechnik · Boast</div>
+    <h2 class="ein mittel" style="--d:1">Der Boast: über die Seitenwand nach vorn</h2>
+    <p class="ein" style="--d:2">Der Ball geht erst an die Seitenwand, dann an die Vorderwand und landet vorn in der anderen Ecke. Ihr Gegner muss quer über den Court nach vorn.</p>
+    <div class="fehler tipp ein" style="--d:3"><strong>Am besten,</strong> wenn Ihr Gegner hinten steht. Steht er am T, ist er schnell am Ball.</div>
+  </div>
+  <div class="court-box ein" style="--d:1">
+    <svg class="court" data-szene="boast"></svg>
+    <div class="legende"><i class="a">A</i>Sie <i class="b">B</i>Ihr Gegner <i class="auf"></i>Aufsprung</div>
+  </div>
+</section>
+
+<section class="folie v-court" data-reihe="analyse">
+  <div>
+    <div class="dach ein">Schlagtechnik · Stopp</div>
+    <h2 class="ein mittel" style="--d:1">Der Stopp: kurz in die vordere Ecke</h2>
+    <p class="ein" style="--d:2">Knapp über dem Blech gespielt, springt der Ball vorn auf und bleibt in der Ecke. Er lohnt sich, wenn Ihr Gegner hinten steht und Sie selbst nah am Ball sind.</p>
+    <div class="fehler ein" style="--d:3"><strong>Aus der hinteren Ecke</strong> ist der Stopp riskant: weiter Weg zur Vorderwand, wenig Kontrolle.</div>
+  </div>
+  <div class="court-box ein" style="--d:1">
+    <svg class="court" data-szene="stopp"></svg>
+    <div class="legende"><i class="a">A</i>Sie <i class="b">B</i>Ihr Gegner <i class="auf"></i>Aufsprung</div>
+  </div>
+</section>
+
+<section class="folie v-court" data-reihe="analyse">
+  <div>
+    <div class="dach ein">Schlagtechnik · Lob</div>
+    <h2 class="ein mittel" style="--d:1">Unter Druck? Der Lob verschafft Zeit.</h2>
+    <p class="ein" style="--d:2">Hoch an die Vorderwand gespielt, fliegt der Ball über Ihren Gegner hinweg in die hintere Ecke. In der Zeit kommen Sie in Ruhe zurück aufs T.</p>
+    <div class="fehler ein" style="--d:3"><strong>Zu flach gespielt,</strong> nimmt Ihr Gegner den Ball aus der Luft.</div>
+  </div>
+  <div class="court-box ein" style="--d:1">
+    <svg class="court" data-szene="lob"></svg>
+    <div class="legende"><i class="a">A</i>Sie <i class="b">B</i>Ihr Gegner <i class="auf"></i>Aufsprung</div>
+  </div>
+</section>
+
+<!-- ================================================================
+     REIHE: REGELN. Grundlage: World Squash, Rules of Singles Squash, Stand 2025
+     (Regelnummern dort). Regelfragen loesen nach knapp der Haelfte der Zeit auf.
+     ================================================================ -->
+<section class="folie v-reihe" data-reihe="regel">
+  <div>
+    <div class="dach ein">Regeln · Zählweise</div>
+    <h2 class="ein" style="--d:1">So wird gezählt</h2>
+    <p class="ein" style="--d:2">Jeder Ballwechsel bringt einen Punkt, egal wer aufgeschlagen hat. Wer den Ballwechsel gewinnt, schlägt als Nächstes auf.</p>
+  </div>
+  <div class="zahlen">
+    <div class="ein" style="--d:2"><b>11</b><span>Punkte gewinnen einen Satz</span></div>
+    <div class="ein" style="--d:3"><b>10:10</b><span>Dann gewinnt, wer zuerst zwei Punkte Vorsprung hat</span></div>
+    <div class="ein" style="--d:4"><b>3</b><span>Gewinnsätze entscheiden meist das Spiel</span></div>
+  </div>
+  <div class="quelle ein" style="--d:5">World Squash, Regeln für das Einzel, Stand 2025, Regel 2</div>
+</section>
+
+<section class="folie v-quiz" data-reihe="regel" data-dauer="32">
+  <div class="court-box ein" style="--d:1">
+    <svg class="court" data-szene="r-direkt"></svg>
+    <div class="legende"><i class="a">A</i>Sie <i class="b">B</i>Ihr Gegner</div>
+  </div>
+  <div>
+    <div class="dach ein">Regelfrage</div>
+    <h2 class="frage ein" style="--d:1">Ihr Schlag geht direkt zur Vorderwand und trifft unterwegs Ihren Gegner.</h2>
+    <div class="wahl ein" style="--d:2"><span>Let</span><span class="richtig">Stroke für Sie</span><span>Stroke für Ihren Gegner</span></div>
+    <div class="gleich ein" style="--d:3">Die Auflösung kommt gleich.</div>
+    <div class="aufloesung"><b>Stroke für Sie.</b> Sie bekommen den Punkt, wenn Ihr Schlag gut gewesen wäre und Sie sich nicht mit dem Ball gedreht haben.<div class="quelle">World Squash, Regel 9.1.2</div></div>
+  </div>
+</section>
+
+<section class="folie v-quiz" data-reihe="regel">
+  <div class="court-box ein" style="--d:1">
+    <svg class="court" data-szene="aufschlag"></svg>
+    <div class="legende"><i class="a">A</i>schlägt auf <i class="b">B</i>Rückschläger</div>
+  </div>
+  <div>
+    <div class="dach ein">Regeln · Aufschlag</div>
+    <h2 class="ein mittel" style="--d:1">Wann ist der Aufschlag gut?</h2>
+    <ol class="schritte kompakt">
+      <li class="ein" style="--d:2">Ein Fuß steht im Aufschlagfeld<small>und berührt die Linie nicht</small></li>
+      <li class="ein" style="--d:3">Der Ball trifft direkt die Vorderwand<small>zwischen Aufschlaglinie und Aus-Linie</small></li>
+      <li class="ein" style="--d:4">Er springt im hinteren Viertel gegenüber auf<small>nicht auf der Linie; volley nehmen ist erlaubt</small></li>
+    </ol>
+    <div class="fehler tipp ein" style="--d:5">Wer den Punkt holt, schlägt wieder auf, dann aus dem anderen Aufschlagfeld.</div>
+    <div class="quelle ein" style="--d:5">World Squash, Regel 5.2 und 5.7</div>
+  </div>
+</section>
+
+<section class="folie v-quiz" data-reihe="regel" data-dauer="32">
+  <div class="court-box ein" style="--d:1">
+    <svg class="court" data-szene="r-seitenwand"></svg>
+    <div class="legende"><i class="a">A</i>Sie <i class="b">B</i>Ihr Gegner</div>
+  </div>
+  <div>
+    <div class="dach ein">Regelfrage</div>
+    <h2 class="frage ein" style="--d:1">Ihr Schlag wäre erst an die Seitenwand gegangen und trifft unterwegs Ihren Gegner.</h2>
+    <div class="wahl ein" style="--d:2"><span class="richtig">Let</span><span>Stroke für Sie</span><span>Stroke für Ihren Gegner</span></div>
+    <div class="gleich ein" style="--d:3">Die Auflösung kommt gleich.</div>
+    <div class="aufloesung"><b>Let.</b> Der Ballwechsel wird wiederholt. Hätte Ihr Schlag sicher gewonnen, gibt es einen Stroke für Sie.<div class="quelle">World Squash, Regel 9.1.3</div></div>
+  </div>
+</section>
+
+<section class="folie v-quiz" data-reihe="regel" data-dauer="34">
+  <div class="court-box ein" style="--d:1">
+    <svg class="court" data-szene="r-weg"></svg>
+    <div class="legende"><i class="a">A</i>Sie <i class="b">B</i>Ihr Gegner</div>
+  </div>
+  <div>
+    <div class="dach ein">Regelfrage</div>
+    <h2 class="frage ein" style="--d:1">Auf dem Weg zum Ball steht Ihr Gegner vor Ihnen. Sie halten an und bitten um einen Let.</h2>
+    <div class="wahl ein" style="--d:2"><span>Let</span><span>Stroke für Sie</span><span>Kein Let</span><span class="richtig">Kommt darauf an</span></div>
+    <div class="gleich ein" style="--d:3">Die Auflösung kommt gleich.</div>
+    <div class="aufloesung"><ul>
+      <li><b>Let,</b> wenn er sich bemüht hat, Platz zu machen.</li>
+      <li><b>Stroke für Sie,</b> wenn er sich nicht bemüht hat.</li>
+      <li><b>Kein Let,</b> wenn Sie den Ball ohnehin nicht erreicht hätten.</li>
+    </ul><div class="quelle">World Squash, Regel 8.6</div></div>
+  </div>
+</section>
+
+<section class="folie v-quiz" data-reihe="regel" data-dauer="32">
+  <div class="court-box ein" style="--d:1">
+    <svg class="court" data-szene="r-gedreht"></svg>
+    <div class="legende"><i class="a">A</i>Sie <i class="b">B</i>Ihr Gegner</div>
+  </div>
+  <div>
+    <div class="dach ein">Regelfrage</div>
+    <h2 class="frage ein" style="--d:1">Sie drehen sich in der hinteren Ecke mit dem Ball und treffen beim Schlag Ihren Gegner.</h2>
+    <div class="wahl ein" style="--d:2"><span>Let</span><span>Stroke für Sie</span><span class="richtig">Stroke für Ihren Gegner</span></div>
+    <div class="gleich ein" style="--d:3">Die Auflösung kommt gleich.</div>
+    <div class="aufloesung"><b>Stroke für Ihren Gegner.</b> Wer sich dreht, trägt das Risiko. Besser rechtzeitig anhalten und um einen Let bitten.<div class="quelle">World Squash, Regel 9.1.5 und 8.11.1</div></div>
+  </div>
+</section>
+
+<section class="folie v-quiz" data-reihe="regel" data-dauer="32">
+  <div class="court-box ein" style="--d:1">
+    <svg class="court" data-szene="r-eigener"></svg>
+    <div class="legende"><i class="a">A</i>Sie <i class="b">B</i>Ihr Gegner</div>
+  </div>
+  <div>
+    <div class="dach ein">Regelfrage</div>
+    <h2 class="frage ein" style="--d:1">Ihr eigener Ball kommt von der Vorderwand zurück und trifft Sie.</h2>
+    <div class="wahl ein" style="--d:2"><span>Let</span><span>Punkt für Sie</span><span class="richtig">Punkt für Ihren Gegner</span></div>
+    <div class="gleich ein" style="--d:3">Die Auflösung kommt gleich.</div>
+    <div class="aufloesung"><b>Punkt für Ihren Gegner.</b> Es sei denn, er stand so, dass Sie nicht ausweichen konnten. Dann gibt es einen Let.<div class="quelle">World Squash, Regel 9.2.1</div></div>
+  </div>
+</section>
+
+<!-- ================================================================
+     REIHE: UEBUNGEN ZU ZWEIT
+     ================================================================ -->
+<section class="folie v-drill" data-reihe="uebung">
+  <div>
+    <div class="dach ein">Übung zu zweit</div>
+    <h2 class="ein" style="--d:1">Boast und Längs</h2>
+    <ol class="schritte">
+      <li class="ein" style="--d:2">A spielt hinten einen Boast</li>
+      <li class="ein" style="--d:3">B läuft nach vorn und spielt längs an der Wand</li>
+      <li class="ein" style="--d:4">A spielt von dort wieder Boast<small>so wechseln beide ständig die Seite</small></li>
+    </ol>
+  </div>
+  <div class="court-box ein" style="--d:1">
+    <svg class="court" data-szene="boast-laengs"></svg>
+    <div class="legende"><i class="a">A</i><i class="b">B</i>die beiden Spieler</div>
+  </div>
+  <div class="karte achten ein" style="--d:3">
+    <div class="preise-titel">Darauf achten</div>
+    <ul>
+      <li>Nach jedem Schlag zurück Richtung T</li>
+      <li>Nach fünf Minuten die Rollen tauschen</li>
+    </ul>
+  </div>
+</section>
+
+<section class="folie v-drill" data-reihe="uebung">
+  <div>
+    <div class="dach ein">Übung zu zweit</div>
+    <h2 class="ein" style="--d:1">Längs im Wechsel</h2>
+    <ol class="schritte">
+      <li class="ein" style="--d:2">Beide spielen auf einer Seite<small>abwechselnd längs an der Wand</small></li>
+      <li class="ein" style="--d:3">Nach jedem Schlag Platz machen, Richtung T</li>
+      <li class="ein" style="--d:4">Ziel: Aufsprung hinter dem Aufschlagfeld</li>
+    </ol>
+  </div>
+  <div class="court-box ein" style="--d:1">
+    <svg class="court" data-szene="laengs-wechsel"></svg>
+    <div class="legende"><i class="a">A</i><i class="b">B</i>die beiden Spieler</div>
+  </div>
+  <div class="karte achten ein" style="--d:3">
+    <div class="preise-titel">Darauf achten</div>
+    <ul>
+      <li>Nach ein paar Minuten die Seite wechseln</li>
+      <li>Erst ruhig, dann mit mehr Tempo</li>
+    </ul>
+  </div>
+</section>
+
+<section class="folie v-drill" data-reihe="uebung">
+  <div>
+    <div class="dach ein">Übung zu zweit</div>
+    <h2 class="ein" style="--d:1">Aufschlag und Return</h2>
+    <ol class="schritte">
+      <li class="ein" style="--d:2">A schlägt zehnmal von rechts auf</li>
+      <li class="ein" style="--d:3">B spielt jeden Return längs an der Wand</li>
+      <li class="ein" style="--d:4">Dann zehnmal von links</li>
+    </ol>
+  </div>
+  <div class="court-box ein" style="--d:1">
+    <svg class="court" data-szene="aufschlag-return"></svg>
+    <div class="legende"><i class="a">A</i><i class="b">B</i>die beiden Spieler</div>
+  </div>
+  <div class="karte achten ein" style="--d:3">
+    <div class="preise-titel">Darauf achten</div>
+    <ul>
+      <li>Der Aufschlag soll hinten die Seitenwand treffen</li>
+      <li>Danach die Rollen tauschen</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ Fusszeile ============ -->
+<div class="fuss">
+  <div class="fortschritt" id="fortschritt"></div>
+  <img src="../bilder/logo-negativ-weiss.svg" alt="Bewegungszentrum für Körperwohl und Squash">
+  <div class="buchen">Courts buchen: <strong>07159&nbsp;45151</strong> oder online</div>
+  <div class="zeit">
+    <div class="offen" id="offen"></div>
+    <div class="uhr" id="uhr"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------------- Einstellungen ----------------
+  // Anzeigedauer wie im Aufenthaltsraum: Grundzeit plus Lesezeit je Wort.
+  // Regelfragen haben eine feste Zeit (data-dauer) und loesen bei AUFLOESUNG_ANTEIL auf.
+  var LESEN = { grund: 6, jeWort: 0.4, min: 20, max: 45 };
+  var AUFLOESUNG_ANTEIL = 0.48;
+  var NEU_LADEN_MINUTEN = 30;
+  var SCHALTER = {};
+
+  // Reihenfolge eines Durchlaufs. "reihe:x" = naechste Folie aus der Themenreihe x.
+  // Gemischt, damit aehnliche Aufbauten nicht aufeinander folgen.
+  var ABLAUF = [
+    'preise', 'reihe:analyse', 'reihe:regel', 'wellpass', 'reihe:analyse', 'reihe:uebung',
+    'ersttestung', 'reihe:regel', 'reihe:analyse', 'ausruestung', 'reihe:uebung', 'samstag',
+    'reihe:regel', 'ball', 'bewertung'
+  ];
+
+  // Oeffnungszeiten je Wochentag (0 = Sonntag)
+  var OEFFNUNG = {
+    0: null,
+    1: '8–14 und 16–22 Uhr', 2: '8–14 und 16–22 Uhr', 3: '8–14 und 16–22 Uhr',
+    4: '8–14 und 16–22 Uhr', 5: '8–14 und 16–22 Uhr',
+    6: '9–14 Uhr'
+  };
+
+  // ---------------- Court-Szenen ----------------
+  // Koordinaten in cm, von oben: x 0 = linke Seitenwand, 640 = rechte; y 0 = Vorderwand, 975 = Rueckwand.
+  // T bei (320, 544). Schritte im ablauf:
+  //   ball:  Punkte [x, y, Marke, Bogen]; Marke 'w' = Wand, 'b' = Aufsprung, 'x' = trifft Spieler;
+  //          Bogen > 0 laesst den Ball auf dem Weg zu diesem Punkt hoch fliegen (groesser zeichnen).
+  //          wer: 'B' faerbt die Spur wie Spieler B. Dauer ergibt sich aus der Laenge.
+  //   lauf:  Spieler laeuft ueber die Punkte in nach.
+  //   geist: gestrichelte Linie (stil 'falsch' = rot), linien: Hilfslinien,
+  //   text: [Text, x, y, Ausrichtung]; | im Text bricht die Zeile um.
+  //   von:   Startzeit in Sekunden.
+  var SZENEN = {
+    't': { spieler: { A: [120, 860] }, ablauf: [
+      { ball: [[120, 860], [60, 0, 'w'], [50, 740, 'b'], [40, 975, 'w'], [75, 925]], von: 0.5 },
+      { lauf: 'A', nach: [[320, 560]], von: 1.1, dauer: 1.5 },
+      { linien: [[320, 544, 0, 0], [320, 544, 640, 0], [320, 544, 0, 975], [320, 544, 640, 975]], von: 3.4 },
+      { text: ['T', 362, 528], von: 3.4 }
+    ], halt: 3.4 },
+    'laengs': { spieler: { A: [150, 470], B: [340, 580] }, ablauf: [
+      { ball: [[150, 470], [62, 0, 'w'], [48, 760, 'b'], [42, 975, 'w'], [72, 935]], von: 0.5 },
+      { text: ['Aufsprung', 80, 735], von: 2.4 },
+      { lauf: 'A', nach: [[320, 560]], von: 1.0, dauer: 1.2 },
+      { lauf: 'B', nach: [[165, 850]], von: 1.5, dauer: 1.6 }
+    ] },
+    'cross': { spieler: { A: [130, 330], B: [340, 590] }, ablauf: [
+      { geist: [[390, 0], [350, 545]], stil: 'falsch', von: 0.3 },
+      { text: ['zu mittig', 352, 300, 'end'], von: 0.3 },
+      { ball: [[130, 330], [390, 0, 'w'], [640, 600, 'w'], [561, 790, 'b'], [505, 930]], von: 0.6 },
+      { lauf: 'A', nach: [[245, 610]], von: 1.3, dauer: 1.3 },
+      { lauf: 'B', nach: [[520, 860]], von: 2.3, dauer: 1.4 }
+    ] },
+    'boast': { spieler: { A: [540, 870], B: [330, 700] }, ablauf: [
+      { ball: [[540, 870], [640, 720, 'w'], [110, 0, 'w'], [40, 95, 'b'], [0, 149, 'w'], [35, 215]], von: 0.5 },
+      { lauf: 'A', nach: [[330, 580]], von: 1.2, dauer: 1.4 },
+      { lauf: 'B', nach: [[115, 245]], von: 1.5, dauer: 1.7 }
+    ] },
+    'stopp': { spieler: { A: [420, 430], B: [130, 850] }, ablauf: [
+      { ball: [[420, 430], [590, 0, 'w'], [606, 52, 'b'], [640, 110, 'w'], [618, 150]], von: 0.5 },
+      { text: ['knapp über dem Blech', 555, 44, 'end'], von: 1.2 },
+      { lauf: 'A', nach: [[330, 560]], von: 1.3, dauer: 1.2 },
+      { lauf: 'B', nach: [[480, 210]], von: 1.0, dauer: 2.0 }
+    ] },
+    'lob': { spieler: { A: [90, 150], B: [440, 540] }, ablauf: [
+      { ball: [[90, 150], [200, 0, 'w'], [590, 870, 'b', 1.1], [612, 950]], von: 0.5 },
+      { text: ['hoch an die Vorderwand', 240, 44], von: 0.8 },
+      { lauf: 'A', nach: [[300, 530]], von: 1.4, dauer: 1.5 },
+      { lauf: 'B', nach: [[545, 835]], von: 2.0, dauer: 1.4 }
+    ] },
+
+    // Uebungen zu zweit
+    'boast-laengs': { spieler: { A: [540, 860], B: [320, 560] }, ablauf: [
+      { ball: [[540, 860], [640, 720, 'w'], [110, 0, 'w'], [45, 90, 'b'], [0, 150, 'w'], [70, 215]], von: 0.5 },
+      { lauf: 'B', nach: [[105, 240]], von: 0.9, dauer: 1.5 },
+      { lauf: 'A', nach: [[140, 865]], von: 1.4, dauer: 1.8 },
+      { ball: [[95, 228], [60, 0, 'w'], [48, 760, 'b'], [44, 975, 'w'], [95, 925]], von: 2.6, wer: 'B' },
+      { lauf: 'B', nach: [[320, 560]], von: 3.0, dauer: 1.4 }
+    ] },
+    'laengs-wechsel': { spieler: { A: [120, 840], B: [280, 620] }, ablauf: [
+      { ball: [[120, 840], [60, 0, 'w'], [46, 770, 'b'], [42, 975, 'w'], [95, 930]], von: 0.5 },
+      { lauf: 'B', nach: [[200, 720], [120, 870]], von: 0.9, dauer: 2.0 },
+      { lauf: 'A', nach: [[250, 800], [290, 620]], von: 1.0, dauer: 1.6 },
+      { ball: [[110, 870], [64, 0, 'w'], [48, 760, 'b'], [44, 975, 'w'], [100, 925]], von: 3.4, wer: 'B' },
+      { lauf: 'B', nach: [[210, 830], [280, 620]], von: 3.8, dauer: 1.5 },
+      { lauf: 'A', nach: [[230, 700], [120, 840]], von: 4.0, dauer: 1.9 }
+    ] },
+    'aufschlag-return': { spieler: { A: [560, 625], B: [190, 790] }, zonen: [[480, 544, 160, 160, 'box']], ablauf: [
+      { ball: [[560, 625], [250, 0, 'w'], [0, 640, 'w', 0.5], [74, 830, 'b'], [120, 880]], von: 0.5 },
+      { lauf: 'A', nach: [[330, 570]], von: 1.1, dauer: 1.1 },
+      { lauf: 'B', nach: [[135, 895]], von: 1.7, dauer: 0.9 },
+      { ball: [[125, 885], [60, 0, 'w'], [48, 760, 'b'], [44, 975, 'w'], [90, 930]], von: 3.1, wer: 'B' },
+      { lauf: 'B', nach: [[250, 650]], von: 3.5, dauer: 1.3 }
+    ] },
+
+    // Regeln
+    'aufschlag': { spieler: { A: [560, 625], B: [190, 790] }, zonen: [[480, 544, 160, 160, 'box'], [0, 544, 320, 431, '']], ablauf: [
+      { ball: [[560, 625], [250, 0, 'w'], [0, 640, 'w', 0.5], [74, 830, 'b'], [118, 885]], von: 0.6 },
+      { text: ['über der|Aufschlaglinie', 300, 62], von: 1.4 },
+      { text: ['hier aufspringen', 160, 952, 'middle'], von: 3.0 }
+    ], halt: 3.4 },
+    'r-direkt': { spieler: { A: [200, 790], B: [258, 520] }, ablauf: [
+      { ball: [[200, 790], [258, 520, 'x']], von: 0.8, dauer: 0.8 },
+      { geist: [[258, 520], [370, 0]], von: 1.9 },
+      { text: ['direkt zur|Vorderwand', 335, 240], von: 1.9 }
+    ], halt: 3.4 },
+    'r-seitenwand': { spieler: { A: [380, 830], B: [510, 690] }, ablauf: [
+      { ball: [[380, 830], [510, 690, 'x']], von: 0.8, dauer: 0.8 },
+      { geist: [[510, 690], [640, 560], [150, 0]], von: 1.9 },
+      { text: ['erst an die Seitenwand', 585, 598, 'end'], von: 1.9 }
+    ], halt: 3.4 },
+    'r-weg': { spieler: { A: [430, 800], B: [300, 460] }, ablauf: [
+      { ball: [[290, 420], [150, 0, 'w'], [70, 190, 'b'], [40, 300]], von: 0.4, wer: 'B' },
+      { lauf: 'A', nach: [[345, 545]], von: 0.9, dauer: 1.1 },
+      { geist: [[345, 545], [95, 270]], von: 2.1 },
+      { text: ['steht im Weg', 345, 445], von: 2.1 }
+    ], halt: 3.4 },
+    'r-gedreht': { spieler: { A: [520, 800], B: [420, 560] }, ablauf: [
+      { ball: [[600, 300], [625, 790, 'b'], [622, 975, 'w'], [560, 890]], von: 0.3, wer: 'B' },
+      { lauf: 'A', nach: [[595, 845], [600, 905], [562, 935], [535, 898]], von: 1.0, dauer: 1.8 },
+      { text: ['dreht sich mit dem Ball', 495, 955, 'end'], von: 1.6 },
+      { ball: [[560, 890], [420, 560, 'x']], von: 2.9, dauer: 0.7 },
+      { geist: [[420, 560], [183, 0]], von: 3.7 }
+    ], halt: 3.2 },
+    'r-eigener': { spieler: { A: [300, 420], B: [430, 780] }, ablauf: [
+      { ball: [[300, 420], [330, 0, 'w'], [300, 420, 'x']], von: 0.6, dauer: 1.5 },
+      { text: ['trifft Sie selbst', 350, 360], von: 2.1 }
+    ], halt: 3.4 }
+  };
+
+  // ---------------- Hilfsfunktionen ----------------
+  function parameter(name) {
+    var m = new RegExp('[?&]' + name + '=([^&]*)').exec(location.search);
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+  // Datum ohne Zeitzonen-Raetsel: immer als Ortszeit lesen
+  function datum(s) {
+    var t = s.split(/[-T:]/);
+    return new Date(+t[0], +t[1] - 1, +t[2], +(t[3] || 0), +(t[4] || 0));
+  }
+  function zwei(n) { return (n < 10 ? '0' : '') + n; }
+
+  var versatz = 0;
+  if (parameter('datum')) versatz = datum(parameter('datum')).getTime() - Date.now();
+  function jetzt() { return new Date(Date.now() + versatz); }
+
+  var tempo = parameter('tempo') ? +parameter('tempo') : 0;
+  var standbild = parameter('zeit');   // Sekunden oder "ende" (Endbild)
+  var vorschau = !!(parameter('datum') || parameter('folie') || parameter('tempo') || standbild !== null);
+
+  // 1rem = 1 % der Breite einer 16:9-Flaeche, die in den Bildschirm passt
+  function groesse() {
+    var u = Math.min(window.innerWidth, window.innerHeight * 16 / 9) / 100;
+    document.documentElement.style.fontSize = u + 'px';
+  }
+
+  // ---------------- Court zeichnen und animieren ----------------
+  var NS = 'http://www.w3.org/2000/svg';
+  var BALL_TEMPO = 650;   // cm je Sekunde, bewusst langsam zum Mitverfolgen
+  var HALT = 2.8;         // so lange bleibt das Endbild stehen
+  var BALL_R = 12;
+
+  function knoten(name, attr, eltern) {
+    var e = document.createElementNS(NS, name);
+    for (var k in attr) if (attr.hasOwnProperty(k)) e.setAttribute(k, attr[k]);
+    if (eltern) eltern.appendChild(e);
+    return e;
+  }
+  function abstand(a, b) { var dx = b[0] - a[0], dy = b[1] - a[1]; return Math.sqrt(dx * dx + dy * dy); }
+  function strecke(pkte) { var c = [0]; for (var i = 1; i < pkte.length; i++) c.push(c[i - 1] + abstand(pkte[i - 1], pkte[i])); return c; }
+  function stelle(pkte, c, s) {
+    var n = pkte.length - 1;
+    if (s >= c[n]) return { x: pkte[n][0], y: pkte[n][1], i: n, q: 1 };
+    for (var i = 1; i <= n; i++) if (s <= c[i]) {
+      var q = (s - c[i - 1]) / ((c[i] - c[i - 1]) || 1);
+      return { x: pkte[i - 1][0] + q * (pkte[i][0] - pkte[i - 1][0]), y: pkte[i - 1][1] + q * (pkte[i][1] - pkte[i - 1][1]), i: i, q: q };
+    }
+    return { x: pkte[0][0], y: pkte[0][1], i: 1, q: 0 };
+  }
+  function teilstueck(pkte, c, s) {
+    var aus = [], i;
+    for (i = 0; i < pkte.length && c[i] <= s; i++) aus.push(pkte[i][0] + ',' + pkte[i][1]);
+    if (i < pkte.length) { var p = stelle(pkte, c, s); aus.push(p.x.toFixed(1) + ',' + p.y.toFixed(1)); }
+    return aus.length > 1 ? aus.join(' ') : '';
+  }
+  function sanft(p) { return p < 0.5 ? 2 * p * p : 1 - 2 * (1 - p) * (1 - p); }
+  function grenze(p) { return p < 0 ? 0 : p > 1 ? 1 : p; }
+  function zeigen(e, an) { e.style.opacity = an ? 1 : 0; }
+
+  function Court(svg, def) {
+    var self = this, i, k;
+    this.def = def; this.schritte = []; this.spieler = {};
+    svg.setAttribute('viewBox', '-26 -68 692 1070');
+    knoten('rect', { x: 0, y: 0, width: 640, height: 975, 'class': 'boden' }, svg);
+    for (i = 40; i < 640; i += 40) knoten('line', { x1: i, y1: 0, x2: i, y2: 975, 'class': 'diele' }, svg);
+    (def.zonen || []).forEach(function (z) {
+      knoten('rect', { x: z[0], y: z[1], width: z[2], height: z[3], 'class': 'zone ' + (z[4] || '') }, svg);
+    });
+    // Kurzlinie, Mittellinie, Aufschlagfelder (Masse nach World Squash)
+    [[0, 544, 640, 544], [320, 544, 320, 975], [160, 544, 160, 704], [0, 704, 160, 704],
+     [480, 544, 480, 704], [480, 704, 640, 704]].forEach(function (l) {
+      knoten('line', { x1: l[0], y1: l[1], x2: l[2], y2: l[3], 'class': 'linie' }, svg);
+    });
+    knoten('rect', { x: -8, y: -8, width: 656, height: 991, 'class': 'wand' }, svg);
+    knoten('text', { x: 320, y: -32, 'class': 'wand-text', 'text-anchor': 'middle' }, svg).textContent = 'Vorderwand';
+
+    var e = this.ebene = knoten('g', {}, svg);
+    var pos = {};
+    for (k in def.spieler) if (def.spieler.hasOwnProperty(k)) pos[k] = def.spieler[k];
+
+    def.ablauf.forEach(function (s) {
+      var x = { von: s.von || 0, dauer: 0 };
+      if (s.ball) {
+        x.typ = 'ball'; x.pkte = s.ball; x.c = strecke(s.ball); x.L = x.c[x.c.length - 1];
+        // Trifft der Ball einen Spieler, endet er an dessen Rand statt in der Mitte
+        x.ende = s.ball[s.ball.length - 1][2] === 'x' ? x.L - 32 : x.L;
+        x.dauer = s.dauer || x.ende / BALL_TEMPO;
+        x.spur = knoten('polyline', { 'class': 'spur spur-' + (s.wer || 'A') }, e);
+        x.marken = [];
+        s.ball.forEach(function (p, j) {
+          if (!j || !p[2]) return;
+          var r = p[2] === 'x' ? 50 : p[2] === 'b' ? 15 : 12;
+          x.marken.push({ ab: Math.min(x.c[j], x.ende) / x.L, k: knoten('circle', { cx: p[0], cy: p[1], r: r, 'class': 'm-' + p[2] }, e) });
+        });
+      } else if (s.lauf) {
+        x.typ = 'lauf'; x.wer = s.lauf;
+        x.pkte = [pos[s.lauf]].concat(s.nach); pos[s.lauf] = s.nach[s.nach.length - 1];
+        x.c = strecke(x.pkte); x.L = x.c[x.c.length - 1]; x.dauer = s.dauer || 1.2;
+        x.spur = knoten('polyline', { 'class': 'weg weg-' + s.lauf }, e);
+      } else {
+        x.typ = 'zeigen';
+        if (s.geist) {
+          x.k = knoten('polyline', { points: s.geist.map(function (p) { return p[0] + ',' + p[1]; }).join(' '), 'class': 'geist ' + (s.stil || '') }, e);
+        } else if (s.linien) {
+          x.k = knoten('g', { 'class': 'hilfe' }, e);
+          s.linien.forEach(function (l) { knoten('line', { x1: l[0], y1: l[1], x2: l[2], y2: l[3] }, x.k); });
+        } else if (s.text) {
+          x.k = knoten('text', { x: s.text[1], y: s.text[2], 'class': 'notiz', 'text-anchor': s.text[3] || 'start' }, e);
+          s.text[0].split('|').forEach(function (z, j) {
+            knoten('tspan', { x: s.text[1], dy: j ? '1.15em' : 0 }, x.k).textContent = z;
+          });
+        }
+      }
+      self.schritte.push(x);
+    });
+
+    for (k in def.spieler) if (def.spieler.hasOwnProperty(k)) {
+      var sg = knoten('g', { 'class': 'sp sp-' + k }, e);
+      knoten('circle', { r: 34 }, sg);
+      knoten('text', { y: 11, 'text-anchor': 'middle' }, sg).textContent = k;
+      this.spieler[k] = sg;
+    }
+    this.ball = knoten('circle', { r: BALL_R, 'class': 'ball' }, e);
+
+    var ende = 0;
+    this.schritte.forEach(function (x) { ende = Math.max(ende, x.von + x.dauer); });
+    this.dauer = ende + (def.halt || HALT);
+    this.zeichne(0);
+  }
+
+  Court.prototype.zeichne = function (t) {
+    var pos = {}, k, ball = null;
+    for (k in this.def.spieler) if (this.def.spieler.hasOwnProperty(k)) pos[k] = this.def.spieler[k];
+    this.schritte.forEach(function (x) {
+      var an = t >= x.von, p = x.dauer ? grenze((t - x.von) / x.dauer) : (an ? 1 : 0);
+      if (x.typ === 'ball') {
+        var s = p * x.ende;
+        x.spur.setAttribute('points', an ? teilstueck(x.pkte, x.c, s) : '');
+        x.marken.forEach(function (m) { zeigen(m.k, an && s >= m.ab * x.L - 0.5); });
+        if (an) ball = { x: x, s: s };
+      } else if (x.typ === 'lauf') {
+        var q = sanft(p);
+        x.spur.setAttribute('points', an ? teilstueck(x.pkte, x.c, q * x.L) : '');
+        if (an) { var st = stelle(x.pkte, x.c, q * x.L); pos[x.wer] = [st.x, st.y]; }
+      } else {
+        zeigen(x.k, an);
+      }
+    });
+    for (k in this.spieler) if (this.spieler.hasOwnProperty(k)) {
+      this.spieler[k].setAttribute('transform', 'translate(' + pos[k][0].toFixed(1) + ',' + pos[k][1].toFixed(1) + ')');
+    }
+    if (ball) {
+      var b = ball.x, st2 = stelle(b.pkte, b.c, ball.s), bogen = b.pkte[st2.i][3] || 0;
+      this.ball.setAttribute('cx', st2.x.toFixed(1));
+      this.ball.setAttribute('cy', st2.y.toFixed(1));
+      this.ball.setAttribute('r', (BALL_R * (1 + bogen * Math.sin(Math.PI * st2.q))).toFixed(1));
+      zeigen(this.ball, true);
+    } else {
+      zeigen(this.ball, false);
+    }
+    // Weich ein- und ausblenden, damit der Neustart nicht springt
+    this.ebene.style.opacity = Math.max(0, Math.min(1, t / 0.3, (this.dauer - t) / 0.5));
+  };
+
+  var courts = [];
+  [].forEach.call(document.querySelectorAll('svg.court'), function (svg) {
+    var def = SZENEN[svg.getAttribute('data-szene')];
+    if (!def) return;
+    var f = svg;
+    while (f && !(f.classList && f.classList.contains('folie'))) f = f.parentNode;
+    courts.push({ folie: f, court: new Court(svg, def) });
+  });
+
+  var laufend = null, laufStart = 0;
+  function courtStarten(f) {
+    laufend = null;
+    courts.forEach(function (c) { if (c.folie === f) laufend = c.court; });
+    laufStart = Date.now();
+    if (laufend) laufend.zeichne(standbild === null ? 0 : standbild === 'ende' ? laufend.dauer - 1 : +standbild);
+  }
+  // requestAnimationFrame fuer fluessige Bewegung. Feuert es nicht (manche Browser setzen es
+  // aus, z. B. wenn sie die Seite fuer unsichtbar halten), zeichnet ein Takt mit 25 Bildern/s.
+  var letzterRahmen = 0;
+  function rahmen() { if (laufend) laufend.zeichne(((Date.now() - laufStart) / 1000) % laufend.dauer); }
+  function animieren() {
+    if (window.requestAnimationFrame) {
+      var schleife = function () { letzterRahmen = Date.now(); rahmen(); window.requestAnimationFrame(schleife); };
+      window.requestAnimationFrame(schleife);
+    }
+    setInterval(function () { if (Date.now() - letzterRahmen > 200) rahmen(); }, 40);
+  }
+
+  // ---------------- Folien ----------------
+  var alle = [].slice.call(document.querySelectorAll('.folie'));
+  var reihen = {};
+  alle.forEach(function (f) {
+    var r = f.getAttribute('data-reihe');
+    if (r) (reihen[r] = reihen[r] || []).push(f);
+  });
+
+  function sichtbar(f) {
+    var t = jetzt();
+    var ab = f.getAttribute('data-ab'), bis = f.getAttribute('data-bis'), sch = f.getAttribute('data-schalter');
+    if (sch && !SCHALTER[sch]) return false;
+    if (ab && t < datum(ab)) return false;
+    if (bis && t >= datum(bis)) return false;
+    return true;
+  }
+
+  function speicher(k, v) {
+    try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { }
+    return null;
+  }
+
+  // Naechste Folie einer Reihe; startet nach einem Neuladen dort, wo sie aufgehoert hat
+  function ausReihe(name) {
+    var liste = reihen[name] || [];
+    var start = +(speicher('bks-squash-' + name) || 0);
+    for (var i = 0; i < liste.length; i++) {
+      var n = (start + i) % liste.length;
+      if (sichtbar(liste[n])) { speicher('bks-squash-' + name, String((n + 1) % liste.length)); return liste[n]; }
+    }
+    return null;
+  }
+
+  var pos = -1, aktiv = null, aufTimer = null;
+
+  function naechste() {
+    for (var i = 0; i < ABLAUF.length; i++) {
+      pos = (pos + 1) % ABLAUF.length;
+      var e = ABLAUF[pos], f = null;
+      if (e.indexOf('reihe:') === 0) f = ausReihe(e.slice(6));
+      else { f = document.querySelector('.folie[data-id="' + e + '"]'); if (f && !sichtbar(f)) f = null; }
+      if (f) return f;
+    }
+    return alle[0];
+  }
+
+  function lesezeit(f) {
+    var woerter = (f.textContent.match(/\S+/g) || []).length;
+    return Math.round(Math.max(LESEN.min, Math.min(LESEN.max, LESEN.grund + woerter * LESEN.jeWort)));
+  }
+
+  function zeige(f) {
+    if (aktiv && aktiv !== f) aktiv.classList.remove('aktiv');
+    if (aufTimer) { clearTimeout(aufTimer); aufTimer = null; }
+    f.classList.remove('aufgeloest');
+    aktiv = f;
+    f.classList.add('aktiv');
+    var s = tempo || +(f.getAttribute('data-dauer') || lesezeit(f));
+    // Regelfrage: erst raten lassen, dann aufloesen
+    if (f.querySelector('.aufloesung')) {
+      if (parameter('aufgeloest')) f.classList.add('aufgeloest');
+      else aufTimer = setTimeout(function () { f.classList.add('aufgeloest'); }, s * 1000 * AUFLOESUNG_ANTEIL);
+    }
+    courtStarten(f);
+    var bar = document.getElementById('fortschritt');
+    bar.style.transition = 'none'; bar.style.width = '0';
+    void bar.offsetWidth;
+    bar.style.transition = 'width ' + s + 's linear'; bar.style.width = '100%';
+    return s;
+  }
+
+  function weiter() {
+    var s = zeige(naechste());
+    setTimeout(weiter, s * 1000);
+  }
+
+  // ---------------- Uhr und Oeffnungszeiten ----------------
+  function uhr() {
+    var t = jetzt();
+    document.getElementById('uhr').textContent = zwei(t.getHours()) + ':' + zwei(t.getMinutes());
+    var o = OEFFNUNG[t.getDay()];
+    document.getElementById('offen').innerHTML = o ? 'Heute geöffnet<br><strong>' + o + '</strong>' : 'Heute geschlossen';
+  }
+
+  // ---------------- Neu laden, aber nur wenn erreichbar ----------------
+  var geladen = Date.now();
+  function vielleichtNeuLaden() {
+    if (vorschau || location.protocol === 'file:') return;
+    if (Date.now() - geladen < NEU_LADEN_MINUTEN * 60 * 1000) return;
+    var x = new XMLHttpRequest();
+    x.open('GET', location.pathname + '?pruefen=' + Date.now(), true);
+    x.timeout = 15000;
+    x.onload = function () { if (x.status === 200) location.reload(); };
+    x.send();
+  }
+
+  // ---------------- Start ----------------
+  window.addEventListener('resize', groesse);
+  groesse();
+  uhr();
+  setInterval(uhr, 10 * 1000);
+  setInterval(vielleichtNeuLaden, 60 * 1000);
+  try { if (navigator.wakeLock) navigator.wakeLock.request('screen').catch(function () { }); } catch (e) { }
+  if (standbild === null) animieren();   // Standbild: einmal gezeichnet, keine Dauerschleife
+
+  var fest = parameter('folie');
+  if (fest) {
+    var f = reihen[fest] ? reihen[fest][(+(parameter('nr') || 1) - 1) % reihen[fest].length]
+                         : document.querySelector('.folie[data-id="' + fest + '"]');
+    zeige(f || alle[0]);
+  } else {
+    weiter();
+  }
+})();
+</script>
+</body>
+</html>
