@@ -112,15 +112,55 @@ p strong{color:#fff;font-weight:650}
 .fehler strong{color:#fff}
 
 /* Kursplan */
-.folie.kursplan{display:block;padding-top:3.4rem}
-.kopf{display:-webkit-box;display:flex;-webkit-box-align:end;align-items:flex-end;justify-content:space-between;margin-bottom:1.8rem}
+[hidden]{display:none!important}
+.folie.kursplan{display:-webkit-box;display:flex;-webkit-box-orient:vertical;flex-direction:column;align-items:stretch;
+  grid-gap:0;gap:0;padding-top:3.4rem}   /* .folie setzt grid-gap 4.5rem, das wirkt sonst auch als Flex-Abstand */
+.kopf{display:-webkit-box;display:flex;-webkit-box-align:end;align-items:flex-end;justify-content:space-between;margin-bottom:1.8rem;flex:0 0 auto}
 .kopf h2{margin:0;font-size:3.3rem}
 .kopf .dach{margin-bottom:.8rem}
 .kopf .rechts{text-align:right;font-size:1.45rem;line-height:1.45;color:var(--text-2)}
 .kopf .rechts strong{color:#fff}
-.kursplan-karte{position:relative;background:#fff;border-radius:1.4rem;overflow:hidden;height:calc(100% - 8rem)}
+.kursplan-karte{position:relative;background:#fff;border-radius:1.4rem;overflow:hidden;flex:1 1 auto;min-height:0}
 .kursplan-karte iframe{position:absolute;top:0;left:0;border:0;-webkit-transform-origin:0 0;transform-origin:0 0;background:#fff}
-.kursplan-hinweis{position:absolute;top:0;left:0;right:0;bottom:0;display:none;align-items:center;justify-content:center;color:#555;font-size:1.8rem}
+
+/* Eigene Wochenansicht: eine Zeile je Tag, die Kurse als Karten nebeneinander.
+   Kein Raster mit leeren Zellen; Kursnamen haben die volle Breite. Ohne Flex-gap (aeltere Samsung-Browser). */
+.woche{flex:1 1 auto;min-height:0;display:-webkit-box;display:flex;-webkit-box-orient:vertical;flex-direction:column}
+.tag{flex:1 1 0;min-height:0;display:-webkit-box;display:flex;align-items:center;margin-bottom:.75rem;padding:0 1.3rem;
+  border-radius:1.2rem;background:var(--flaeche);border:1px solid var(--linie)}
+.tag:last-child{margin-bottom:0}
+.tag.heute{background:rgba(88,148,213,.14);border:2px solid var(--hellblau)}
+.t-kopf{flex:0 0 14rem;min-width:0}
+.t-kopf b{display:block;font-size:1.8rem;font-weight:700;color:#fff;line-height:1.1}
+.t-kopf span{font-size:1.3rem;color:var(--text-3);font-feature-settings:"tnum" 1}
+.t-kopf em,.k-marke{font-style:normal;font-size:1rem;font-weight:750;letter-spacing:.09em;text-transform:uppercase;color:var(--grund);
+  background:var(--hellblau);border-radius:2rem;padding:.3rem .8rem;white-space:nowrap}
+.t-kopf em{margin-left:.7rem;vertical-align:.15rem}
+.tag.vorbei .t-kopf,.tag.vorbei .leer{opacity:.45}
+.kurse{flex:1 1 auto;min-width:0;display:-webkit-box;display:flex;align-items:center}
+.kurs{position:relative;flex:1 1 0;min-width:0;max-width:calc(50% - .5rem);margin-right:1rem;display:-webkit-box;display:flex;align-items:center;
+  background:rgba(255,255,255,.075);border-radius:1rem;padding:.5rem 1.2rem .5rem 1.7rem}
+.kurs:last-child{margin-right:0}
+.kurs:before{content:"";position:absolute;left:0;top:0;bottom:0;width:.5rem;border-radius:1rem 0 0 1rem;background:var(--farbe, var(--hellblau))}
+.k-zeit{flex:0 0 auto;margin-right:1.6rem;text-align:left;font-feature-settings:"tnum" 1}
+.k-zeit b{display:block;font-size:1.9rem;font-weight:740;color:#fff;letter-spacing:-.01em;line-height:1.05}
+.k-zeit span{display:block;font-size:1.15rem;color:var(--text-3);margin-top:.15rem}
+.k-text{flex:1 1 auto;min-width:0}
+.k-name{font-size:1.6rem;font-weight:620;color:#fff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.k-zeile{display:-webkit-box;display:flex;align-items:center;margin-top:.2rem;min-width:0}
+.k-trainer{flex:0 1 auto;min-width:0;font-size:1.2rem;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.k-marke{flex:0 0 auto;margin-left:.9rem;font-size:.95rem;padding:.2rem .7rem}
+.kurs.vorbei{opacity:.38}
+.kurs.naechster,.kurs.laeuft{background:rgba(88,148,213,.24);box-shadow:inset 0 0 0 2px var(--hellblau)}
+.kurs.abgesagt .k-zeit b,.kurs.abgesagt .k-name{text-decoration:line-through;opacity:.6}
+.k-marke.warn{background:#e08a5b}
+.leer{font-size:1.4rem;color:var(--text-3)}
+.woche.dicht .tag{margin-bottom:.55rem}
+.woche.dicht .kurs{max-width:none;padding:.35rem .9rem .35rem 1.5rem}
+.woche.dicht .k-zeit b{font-size:1.6rem}
+.woche.dicht .k-zeit span{font-size:1.05rem}
+.woche.dicht .k-name{font-size:1.35rem}
+.woche-fuss{flex:0 0 auto;margin-top:1rem;font-size:1.2rem;color:var(--text-3)}
 
 /* Kacheln (Offener Samstag) */
 .kacheln .kachel{display:-webkit-box;display:flex;margin-bottom:1.3rem;background:var(--flaeche);border:1px solid var(--linie);border-radius:1.2rem;padding:1.8rem 2rem}
@@ -177,15 +217,20 @@ p strong{color:#fff;font-weight:650}
 <div id="buehne">
 
 <!-- ============ KURSPLAN (live aus Virtuagym) ============ -->
-<section class="folie kursplan" data-id="kursplan" data-dauer="25">
+<section class="folie kursplan" data-id="kursplan" data-dauer="35">
   <div class="kopf ein">
     <div>
-      <div class="dach">Kursplan</div>
+      <div class="dach" id="kursplan-dach">Kursplan</div>
       <h2 id="kursplan-titel">Kurse diese Woche</h2>
     </div>
     <div class="rechts">In jeder Mitgliedschaft <strong>alle Kurse inklusive</strong><br>Ohne Mitgliedschaft: 10er-Kurskarte für 150&nbsp;€</div>
   </div>
-  <div class="kursplan-karte ein" style="--d:1">
+  <!-- Eigene Darstellung aus kurse.json (stuendlich per GitHub Action aus dem oeffentlichen
+       Virtuagym-Plan). Sind die Daten aelter als 3 Tage, springt die eingebettete
+       Virtuagym-Ansicht darunter ein. -->
+  <div class="woche ein" id="woche" style="--d:1" hidden></div>
+  <div class="woche-fuss ein" id="woche-fuss" style="--d:2" hidden></div>
+  <div class="kursplan-karte ein" id="kursplan-ersatz" style="--d:1" hidden>
     <iframe id="kursplan-rahmen" title="Kursplan" scrolling="no"></iframe>
   </div>
 </section>
@@ -643,7 +688,10 @@ p strong{color:#fff;font-weight:650}
   'use strict';
 
   // ---------------- Einstellungen ----------------
-  var DAUER = 14;              // Sekunden je Folie (Kursplan hat eigene Dauer, data-dauer)
+  // Anzeigedauer richtet sich nach der Textmenge: Grundzeit plus Lesezeit je Wort
+  // (0,4 s je Wort = 150 Woerter pro Minute, gemuetlich und aus einigen Metern Abstand).
+  // Eine Folie mit data-dauer behaelt ihre feste Zeit (Kursplan).
+  var LESEN = { grund: 6, jeWort: 0.4, min: 18, max: 45 };
   var NEU_LADEN_MINUTEN = 30;  // holt neue Inhalte, wenn die Seite geaendert wurde
   var SCHALTER = {
     gutscheine: true           // false, falls die Gutscheine nicht rechtzeitig stehen (wie GUTSCHEINE_ZEIGEN im Aushang)
@@ -740,14 +788,20 @@ p strong{color:#fff;font-weight:650}
     return alle[0];
   }
 
+  function lesezeit(f) {
+    var woerter = (f.textContent.match(/\S+/g) || []).length;
+    return Math.round(Math.max(LESEN.min, Math.min(LESEN.max, LESEN.grund + woerter * LESEN.jeWort)));
+  }
+
   function zeige(f) {
     if (aktiv && aktiv !== f) {
       aktiv.classList.remove('aktiv');
       if (aktiv.getAttribute('data-id') === 'kursplan') kursplanLaden(false);
     }
     aktiv = f;
+    if (f.getAttribute('data-id') === 'kursplan') kursplanZeigen();   // "vorbei" und "Als Nächstes" neu berechnen
     f.classList.add('aktiv');
-    var s = tempo || +(f.getAttribute('data-dauer') || DAUER);
+    var s = tempo || +(f.getAttribute('data-dauer') || lesezeit(f));
     var bar = document.getElementById('fortschritt');
     bar.style.transition = 'none'; bar.style.width = '0';
     void bar.offsetWidth;
@@ -761,24 +815,110 @@ p strong{color:#fff;font-weight:650}
   }
 
   // ---------------- Kursplan ----------------
+  // Daten: kurse.json, stuendlich per GitHub Action aus dem oeffentlichen Virtuagym-Plan
+  // (werkzeug/kursplan-holen.mjs). Sind sie aelter als KURSE_MAX_ALTER_TAGE oder fehlt die
+  // gezeigte Woche, springt die eingebettete Virtuagym-Ansicht ein.
   // Sa ab 14 Uhr und sonntags zeigt der Plan schon die kommende Woche.
-  var kursplanZeit = 0;
+  var KURSE_MAX_ALTER_TAGE = 3;
+  var TAGE = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+  var MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+  var kursdaten = null, kursplanZeit = 0, geprueft = false;
+
+  function anzeigeWoche() {
+    var t = jetzt(), tag = t.getDay(), naechste = (tag === 0) || (tag === 6 && t.getHours() >= 14);
+    var mo = new Date(t.getFullYear(), t.getMonth(), t.getDate() - ((tag + 6) % 7) + (naechste ? 7 : 0));
+    return { mo: mo, naechste: naechste };
+  }
+
   function kursplanLaden(sofort) {
     if (!sofort && Date.now() - kursplanZeit < 5 * 60 * 1000) return;
-    var t = jetzt(), tag = t.getDay(), naechsteWoche = (tag === 0) || (tag === 6 && t.getHours() >= 14);
-    var url = KURSPLAN_URL + '?embedded=1';
-    if (naechsteWoche) {
-      var mo = new Date(t.getFullYear(), t.getMonth(), t.getDate() + (tag === 0 ? 1 : 2));
-      url = KURSPLAN_URL + '/week/' + iso(mo) + '?embedded=1';
-    }
-    document.getElementById('kursplan-titel').textContent = naechsteWoche ? 'Kurse nächste Woche' : 'Kurse diese Woche';
-    document.getElementById('kursplan-rahmen').src = url;
     kursplanZeit = Date.now();
+    var x = new XMLHttpRequest();
+    x.open('GET', 'kurse.json?t=' + Date.now(), true);
+    x.timeout = 15000;
+    x.onload = function () {
+      try { if (x.status === 200) kursdaten = JSON.parse(x.responseText); } catch (e) { }
+      geprueft = true; kursplanZeigen();
+    };
+    x.onerror = x.ontimeout = function () { geprueft = true; kursplanZeigen(); };   // alte Daten behalten
+    x.send();
+  }
+
+  function kursplanZeigen() {
+    var w = anzeigeWoche(), d = kursdaten;
+    if (!geprueft) return;   // erste Antwort abwarten, sonst blitzt kurz die Virtuagym-Ansicht auf
+    var ok = !!(d && d.kurse && d.wochen && d.wochen.indexOf(iso(w.mo)) >= 0 &&
+                Date.now() - Date.parse(d.stand) < KURSE_MAX_ALTER_TAGE * 864e5);
+    document.getElementById('kursplan-titel').textContent = w.naechste ? 'Kurse nächste Woche' : 'Kurse diese Woche';
+    document.getElementById('kursplan-dach').textContent = 'Kursplan · ' + zeitraum(w.mo);
+    document.getElementById('woche').hidden = !ok;
+    document.getElementById('woche-fuss').hidden = !ok;
+    document.getElementById('kursplan-ersatz').hidden = ok;
+    if (ok) { wocheZeichnen(d, w.mo); return; }
+    var url = KURSPLAN_URL + (w.naechste ? '/week/' + iso(w.mo) : '') + '?embedded=1';
+    var fr = document.getElementById('kursplan-rahmen');
+    if (fr.getAttribute('src') !== url) fr.setAttribute('src', url);
+    kursplanSkalieren();
+  }
+
+  function zeitraum(mo) {
+    var so = new Date(mo.getFullYear(), mo.getMonth(), mo.getDate() + 6);
+    return mo.getMonth() === so.getMonth()
+      ? mo.getDate() + '. bis ' + so.getDate() + '. ' + MONATE[so.getMonth()]
+      : mo.getDate() + '. ' + MONATE[mo.getMonth()] + ' bis ' + so.getDate() + '. ' + MONATE[so.getMonth()];
+  }
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function uhrzeit(s) { return s.replace(/^0/, ''); }
+
+  function wocheZeichnen(d, mo) {
+    var t = jetzt(), heute = iso(t), jetztHM = zwei(t.getHours()) + ':' + zwei(t.getMinutes());
+    var tage = [], i, max = 0, naechster = null;
+    for (i = 0; i < 7; i++) {
+      var dt = new Date(mo.getFullYear(), mo.getMonth(), mo.getDate() + i);
+      tage.push({ d: dt, iso: iso(dt), kurse: [] });
+    }
+    d.kurse.forEach(function (k) {
+      for (var j = 0; j < 7; j++) if (tage[j].iso === k.datum) tage[j].kurse.push(k);
+      if (!naechster && !k.abgesagt && (k.datum > heute || (k.datum === heute && k.start > jetztHM))) naechster = k;
+    });
+    if (!tage[6].kurse.length) tage.pop();   // Sonntag nur, wenn dort Kurse stattfinden
+    tage.forEach(function (tg) { max = Math.max(max, tg.kurse.length); });
+
+    var html = tage.map(function (tg) {
+      var istHeute = tg.iso === heute, vorbei = tg.iso < heute;
+      var kopf = '<div class="t-kopf"><b>' + TAGE[tg.d.getDay()] + '</b><span>' +
+        zwei(tg.d.getDate()) + '.' + zwei(tg.d.getMonth() + 1) + '.</span>' + (istHeute ? '<em>Heute</em>' : '') + '</div>';
+      var karten = tg.kurse.length ? tg.kurse.map(function (k) {
+        var laeuft = k.datum === heute && k.start <= jetztHM && jetztHM < k.ende;
+        var aus = k.datum < heute || (k.datum === heute && k.ende <= jetztHM);
+        var klasse = 'kurs' + (aus ? ' vorbei' : '') + (laeuft ? ' laeuft' : '') + (k === naechster ? ' naechster' : '') + (k.abgesagt ? ' abgesagt' : '');
+        var farbe = /^#[0-9A-Fa-f]{3,6}$/.test(k.farbe || '') ? ' style="--farbe:' + k.farbe + '"' : '';
+        var marke = k.abgesagt ? '<span class="k-marke warn">Fällt aus</span>'
+          : laeuft ? '<span class="k-marke">Läuft gerade</span>'
+          : k === naechster ? '<span class="k-marke">Als Nächstes</span>'
+          : k.voll && !aus ? '<span class="k-marke warn">Ausgebucht</span>' : '';
+        return '<div class="' + klasse + '"' + farbe + '>' +
+          '<div class="k-zeit"><b>' + uhrzeit(k.start) + '</b><span>bis ' + uhrzeit(k.ende) + ' Uhr</span></div>' +
+          '<div class="k-text"><div class="k-name">' + esc(k.titel) + '</div>' +
+          '<div class="k-zeile"><span class="k-trainer">' + esc(k.trainer || '') + '</span>' + marke + '</div></div></div>';
+      }).join('') : '<div class="leer">Keine Kurse</div>';
+      return '<div class="tag' + (istHeute ? ' heute' : '') + (vorbei ? ' vorbei' : '') + '">' + kopf +
+        '<div class="kurse">' + karten + '</div></div>';
+    }).join('');
+
+    var woche = document.getElementById('woche');
+    woche.className = 'woche ein' + (max > 2 || tage.length > 6 ? ' dicht' : '');
+    woche.innerHTML = html;
+    var st = new Date(Date.parse(d.stand));
+    document.getElementById('woche-fuss').textContent = 'Aus unserem Virtuagym-Kursplan · Stand ' +
+      zwei(st.getDate()) + '.' + zwei(st.getMonth() + 1) + '., ' + zwei(st.getHours()) + ':' + zwei(st.getMinutes()) + ' Uhr';
   }
   // Virtuagym-Plan in 1200 px Breite zeichnen und auf die Karte vergroessern (passt fuer ca. 5 Zeitreihen)
   function kursplanSkalieren() {
     var karte = document.querySelector('.kursplan-karte'), fr = document.getElementById('kursplan-rahmen');
-    if (!karte || !fr) return;
+    if (!karte || !fr || karte.hidden || !karte.clientWidth) return;
     var B = 1200, s = karte.clientWidth / B;
     fr.style.width = B + 'px';
     fr.style.height = (karte.clientHeight / s) + 'px';
