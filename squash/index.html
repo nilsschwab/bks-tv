@@ -9,7 +9,7 @@
   Slides fuer den Fernseher im Squashbereich.
 
   Gleicher Stil und gleicher Ablauf wie die Slides im Aufenthaltsraum (../index.html):
-  Folienwechsel von selbst, Neuladen alle 30 Minuten (nur wenn der Server antwortet),
+  Folienwechsel von selbst, Neuladen einmal am Tag zwischen 6 und 7 Uhr (nur wenn der Server antwortet),
   Folien mit data-ab / data-bis erscheinen und verschwinden zum Datum von selbst,
   Folien mit data-reihe bilden Themenreihen.
 
@@ -780,7 +780,10 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
   // Regelfragen haben eine feste Zeit (data-dauer) und loesen bei AUFLOESUNG_ANTEIL auf.
   var LESEN = { grund: 6, jeWort: 0.4, min: 20, max: 45 };
   var AUFLOESUNG_ANTEIL = 0.48;
-  var NEU_LADEN_MINUTEN = 30;
+  // Neu laden nur einmal frueh am Morgen, wie im Aufenthaltsraum: Bei jedem Neuladen blendet der
+  // Samsung-Browser seinen Zeiger ein, cursor:none hilft dagegen nicht (Nils, 16.10.2026).
+  var NEU_LADEN_STUNDE = 6;     // zwischen 6 und 7 Uhr
+  var NEU_LADEN_SPAETESTENS = 24; // Stunden: falls die Morgenstunde verpasst wurde
   var SCHALTER = {
     gutscheine: true           // false, falls die Gutscheine nicht rechtzeitig stehen (wie im Aufenthaltsraum)
   };
@@ -1190,7 +1193,9 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
   var geladen = Date.now();
   function vielleichtNeuLaden() {
     if (vorschau || location.protocol === 'file:') return;
-    if (Date.now() - geladen < NEU_LADEN_MINUTEN * 60 * 1000) return;
+    var alter = Date.now() - geladen, t = jetzt();
+    var morgens = t.getHours() === NEU_LADEN_STUNDE && alter > 60 * 60 * 1000;
+    if (!morgens && alter < NEU_LADEN_SPAETESTENS * 3600 * 1000) return;
     var x = new XMLHttpRequest();
     x.open('GET', location.pathname + '?pruefen=' + Date.now(), true);
     x.timeout = 15000;
