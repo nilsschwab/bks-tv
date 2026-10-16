@@ -267,6 +267,42 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
 .weiter span{display:block;font-size:1.4rem;line-height:1.4;color:var(--text-2);margin-top:.4rem}
 .weiter span strong{color:#fff;font-weight:650}
 
+/* Farbblock rechts statt links (Trainerstunde) */
+.folie.v-panel.rechts{grid-template-columns:1.1fr .9fr;padding-left:5.5rem;padding-right:0}
+.v-panel.rechts > .panel{-webkit-box-ordinal-group:3;order:2;padding:4rem 5.5rem 4rem 4.5rem}
+.erfolge{list-style:none;margin:2.4rem 0 0;padding:0}
+.erfolge li{position:relative;padding:1.3rem 0 1.3rem 4.4rem;border-top:1px solid var(--linie);font-size:2.4rem;font-weight:700;line-height:1.2;color:#fff}
+.erfolge li:first-child{border-top:0}
+.erfolge li:before{content:"";position:absolute;left:.4rem;top:1.75rem;width:2.2rem;height:2.2rem;border-radius:50%;
+  background:var(--hellblau);box-shadow:0 0 0 .5rem rgba(88,148,213,.22)}
+.erfolge li small{display:block;font-size:1.5rem;font-weight:400;color:var(--text-2);margin-top:.35rem}
+
+/* Trainerstunde mit Foto: etwas kompakter, damit Erfolge und Preis neben das Bild passen */
+.trainer-foto .erfolge{margin:1.6rem 0 2.2rem}
+.trainer-foto .erfolge li{font-size:2.1rem;padding:1rem 0 1rem 4rem}
+.trainer-foto .erfolge li:before{top:1.35rem;width:2rem;height:2rem}
+.trainer-foto .erfolge li small{font-size:1.4rem}
+.trainer-foto .kaufen b{font-size:5.6rem}
+.bildnachweis{position:absolute;right:1.4rem;bottom:1.1rem;font-size:1.1rem;color:rgba(255,255,255,.88);
+  text-shadow:0 1px 3px rgba(0,0,0,.7)}
+
+/* Was die Trainerstunde bringt: drei Karten */
+.stufen{display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));grid-gap:1.8rem}
+.stufen > div{background:var(--flaeche);border:1px solid var(--linie);border-radius:1.4rem;padding:2.4rem 2.4rem 2.6rem}
+.stufen b{display:block;font-size:1.25rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--hellblau);margin-bottom:.9rem}
+.stufen h3{margin:0 0 .7rem;font-size:2.2rem;font-weight:700;line-height:1.2;color:#fff}
+.stufen p{font-size:1.55rem;line-height:1.45;margin:0}
+
+/* Schlaeger: Produktfoto auf seinem eigenen Grund, ueber die halbe Flaeche */
+.v-halb .bild.produkt img{object-fit:contain;object-position:50% 50%}
+.werte{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));grid-gap:1rem;max-width:46rem;margin:.4rem 0 2rem}
+.werte div{background:var(--flaeche);border:1px solid var(--linie);border-radius:1rem;padding:1rem 1.4rem}
+.werte b{display:block;font-size:1.15rem;font-weight:650;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3)}
+.werte span{display:block;font-size:1.9rem;font-weight:700;color:#fff;margin-top:.2rem;font-feature-settings:"tnum" 1}
+.kaufen{display:-webkit-box;display:flex;align-items:baseline}
+.kaufen b{font-size:6.4rem;font-weight:780;line-height:1;letter-spacing:-.03em;color:var(--hellblau);margin-right:2rem;font-feature-settings:"tnum" 1}
+.kaufen span{font-size:1.7rem;font-weight:600;color:#fff}
+
 /* ---------- Fusszeile ---------- */
 .fuss{position:fixed;left:0;right:0;bottom:0;height:7.2rem;display:-webkit-box;display:flex;align-items:center;justify-content:space-between;
   padding:0 5.5rem;border-top:1px solid var(--linie);background:rgba(10,13,40,.55)}
@@ -391,6 +427,79 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
     <img src="../bilder/qr-bewertung.svg" alt="QR-Code zur Google-Bewertung">
     <div class="unter">Code scannen und Ihre Erfahrung schildern</div>
   </div>
+</section>
+
+<!-- ================================================================
+     TRAINERSTUNDE (Nils, 16.10.2026): 60 EUR, 60 Minuten, Court inklusive.
+     Erfolge nach Angabe Nils; U19-WM 2019 Kuala Lumpur laut DSQV Baden-Wuerttemberg.
+     Foto: Christian Lortat, Bundesliga-Playoffs (Instagram squash_bw, 17.05.2026), auf Nils
+     zugeschnitten, der Gegner ist nicht im Bild. Einsatz auf Wunsch Nils mit Fotonachweis.
+     ================================================================ -->
+<section class="folie v-halb trainer-foto" data-id="trainer">
+  <div>
+    <div class="dach ein">Trainerstunde</div>
+    <h2 class="ein mittel" style="--d:1">Squash lernen bei Nils&nbsp;Schwab</h2>
+    <ul class="erfolge">
+      <li class="ein" style="--d:2">Deutscher Jugendmeister</li>
+      <li class="ein" style="--d:3">Jugendnationalspieler<small>U19-Weltmeisterschaft 2019 in Kuala Lumpur</small></li>
+      <li class="ein" style="--d:4">Aktuell Bundesligaspieler<small>für die Sport-Insel Stuttgart</small></li>
+    </ul>
+    <div class="kaufen ein" style="--d:5"><b>60&nbsp;€</b><span>60 Minuten, Court inklusive</span></div>
+    <div class="quelle ein" style="--d:6;font-size:1.4rem;color:var(--text-2)">Termin am Empfang oder unter 07159&nbsp;45151</div>
+  </div>
+  <div class="bild"><img src="../bilder/nils-schwab-bundesliga.jpg" alt="Nils Schwab in der Squash-Bundesliga" style="object-position:50% 25%"><span class="bildnachweis">Foto: Christian Lortat</span></div>
+</section>
+
+<section class="folie v-reihe" data-id="trainer-inhalt">
+  <div>
+    <div class="dach ein">Trainerstunde mit Nils Schwab</div>
+    <h2 class="ein" style="--d:1">Was Sie hier sehen, üben wir auf dem Court.</h2>
+    <p class="ein" style="--d:2">Eine Stunde, Court inklusive, für 60&nbsp;€. Ob Sie gerade anfangen oder schon in der Liga spielen: Wir arbeiten an dem, was Ihr Spiel weiterbringt.</p>
+    <div class="fehler tipp ein" style="--d:3"><strong>Termin</strong> am Empfang oder unter 07159&nbsp;45151</div>
+  </div>
+  <div class="stufen">
+    <div class="ein" style="--d:2"><b>Einstieg</b><h3>Griff, Schlag, Laufweg</h3><p>Damit der Ball von Anfang an sauber an die Vorderwand kommt.</p></div>
+    <div class="ein" style="--d:3"><b>Freizeit</b><h3>Gezielt spielen</h3><p>Longline, Boast und Stopp bewusst einsetzen, statt den Ball nur zurückzuspielen.</p></div>
+    <div class="ein" style="--d:4"><b>Wettkampf</b><h3>Taktik und Druck</h3><p>Druck aus dem Hinterfeld, das T beherrschen und die eigenen Schwachstellen angehen.</p></div>
+  </div>
+</section>
+
+<!-- ================================================================
+     SCHLAEGER (Verkauf am Empfang, Preise Nils 16.10.2026). Bilder: Dunlop-Produktfotos von
+     dunlopsports.com. Revelation 125: Werte vom Preisschild am Empfang (Artikelnummer 10316318).
+     ================================================================ -->
+<section class="folie v-halb" data-id="tristorm">
+  <div>
+    <div class="dach ein">Zu kaufen am Empfang</div>
+    <h2 class="ein" style="--d:1">Dunlop Tristorm Graphite</h2>
+    <div class="akzent ein" style="--d:2">Für alle, die mehr Kontrolle wollen.</div>
+    <div class="werte ein" style="--d:3">
+      <div><b>Gewicht</b><span>145&nbsp;g</span></div>
+      <div><b>Schlagfläche</b><span>500&nbsp;cm²</span></div>
+      <div><b>Balance</b><span>extra kopfleicht</span></div>
+      <div><b>Rahmen</b><span>100&nbsp;% Graphit</span></div>
+    </div>
+    <div class="kaufen ein" style="--d:4"><b>69,90&nbsp;€</b><span>zu kaufen am Empfang</span></div>
+    <div class="quelle ein" style="--d:5">Herstellerangaben Dunlop</div>
+  </div>
+  <div class="bild produkt" style="background:#ffffff"><img src="../bilder/schlaeger-tristorm-graphite.jpg" alt="Dunlop Tristorm Graphite"></div>
+</section>
+
+<section class="folie v-halb links" data-id="soniccore">
+  <div>
+    <div class="dach ein">Zu kaufen am Empfang</div>
+    <h2 class="ein mittel" style="--d:1">Dunlop SonicCore Revelation&nbsp;125</h2>
+    <div class="akzent ein" style="--d:2">Für Fortgeschrittene und Ligaspieler.</div>
+    <div class="werte ein" style="--d:3">
+      <div><b>Gewicht</b><span>156&nbsp;g</span></div>
+      <div><b>Schlagfläche</b><span>500&nbsp;cm²</span></div>
+      <div><b>Balance</b><span>leicht grifflastig</span></div>
+      <div><b>Material</b><span>Premium-Graphit</span></div>
+    </div>
+    <div class="kaufen ein" style="--d:4"><b>89,90&nbsp;€</b><span>statt <s>159,95&nbsp;€</s> UVP</span></div>
+    <div class="quelle ein" style="--d:5">Mit Dunlop Hydramax Pro Grip. Angaben Dunlop</div>
+  </div>
+  <div class="bild produkt" style="background:#ededed"><img src="../bilder/schlaeger-soniccore-revelation-125.jpg" alt="Dunlop SonicCore Revelation 125"></div>
 </section>
 
 <!-- Gutscheine: Verkauf ab 28.11., Preise bei Kauf bis 15.12. (wie im Aufenthaltsraum) -->
@@ -762,7 +871,8 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
 <div class="fuss">
   <div class="fortschritt" id="fortschritt"></div>
   <img src="../bilder/logo-negativ-weiss.svg" alt="Bewegungszentrum für Körperwohl und Squash">
-  <div class="buchen">Courts buchen: <strong>07159&nbsp;45151</strong> oder online</div>
+  <div class="buchen" id="buchen-court">Courts buchen: <strong>07159&nbsp;45151</strong> oder online</div>
+  <div class="buchen" id="buchen-trainer" hidden>Trainerstunde mit Nils Schwab: <strong>60&nbsp;€</strong>, Court inklusive</div>
   <div class="zeit">
     <div class="offen" id="offen"></div>
     <div class="uhr" id="uhr"></div>
@@ -791,11 +901,12 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
   // Reihenfolge eines Durchlaufs. "reihe:x" = naechste Folie aus der Themenreihe x.
   // Gemischt, damit aehnliche Aufbauten nicht aufeinander folgen.
   // Offener Samstag zweimal pro Durchlauf (Wunsch Nils 15.10.), solange er ansteht.
+  // Trainerstunde zweimal, beide Schlaeger je einmal pro Durchlauf (Nils 16.10.).
   var ABLAUF = [
-    'preise', 'reihe:analyse', 'reihe:familie', 'reihe:regel', 'samstag', 'reihe:analyse',
-    'reihe:uebung', 'wellpass', 'reihe:familie', 'reihe:regel', 'ersttestung', 'reihe:analyse',
-    'ausruestung', 'samstag', 'reihe:uebung', 'gutscheine', 'reihe:regel', 'ball',
-    'reihe:familie', 'bewertung'
+    'preise', 'reihe:analyse', 'trainer', 'reihe:regel', 'reihe:familie', 'samstag',
+    'tristorm', 'reihe:analyse', 'reihe:uebung', 'trainer-inhalt', 'wellpass', 'reihe:familie',
+    'reihe:regel', 'ersttestung', 'reihe:analyse', 'soniccore', 'samstag', 'reihe:uebung',
+    'trainer', 'gutscheine', 'reihe:regel', 'ausruestung', 'ball', 'reihe:familie', 'bewertung'
   ];
 
   // Oeffnungszeiten je Wochentag (0 = Sonntag)
@@ -1156,6 +1267,7 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
     return Math.round(Math.max(LESEN.min, Math.min(LESEN.max, LESEN.grund + woerter * LESEN.jeWort)));
   }
 
+  var fussWechsel = true;
   function zeige(f) {
     if (aktiv && aktiv !== f) aktiv.classList.remove('aktiv');
     if (aufTimer) { clearTimeout(aufTimer); aufTimer = null; }
@@ -1169,6 +1281,10 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
       else aufTimer = setTimeout(function () { f.classList.add('aufgeloest'); }, s * 1000 * AUFLOESUNG_ANTEIL);
     }
     courtStarten(f);
+    // Fusszeile: abwechselnd Courtbuchung und Trainerstunde (Nils, 16.10.2026)
+    fussWechsel = !fussWechsel;
+    document.getElementById('buchen-court').hidden = fussWechsel;
+    document.getElementById('buchen-trainer').hidden = !fussWechsel;
     var bar = document.getElementById('fortschritt');
     bar.style.transition = 'none'; bar.style.width = '0';
     void bar.offsetWidth;
