@@ -9,7 +9,7 @@
   Slides fuer den Fernseher im Aufenthaltsraum.
 
   Wie es laeuft:
-  - Die Seite wechselt selbst von Folie zu Folie und laedt sich alle 30 Minuten neu
+  - Die Seite wechselt selbst von Folie zu Folie und laedt sich einmal am Tag (6-7 Uhr) neu
     (nur wenn der Server erreichbar ist - sonst bliebe nach einem WLAN-Aussetzer eine
     Fehlerseite stehen, die nie wieder verschwindet).
   - Der Kursplan kommt live aus dem oeffentlichen Virtuagym-Terminplan (embedded=1),
@@ -769,7 +769,11 @@ p strong{color:#fff;font-weight:650}
   // (0,4 s je Wort = 150 Woerter pro Minute, gemuetlich und aus einigen Metern Abstand).
   // Eine Folie mit data-dauer behaelt ihre feste Zeit (Kursplan).
   var LESEN = { grund: 6, jeWort: 0.4, min: 18, max: 45 };
-  var NEU_LADEN_MINUTEN = 30;  // holt neue Inhalte, wenn die Seite geaendert wurde
+  // Neu laden nur einmal frueh am Morgen (vor der Oeffnung): Bei jedem Neuladen blendet der
+  // Samsung-Browser seinen Zeiger ein, cursor:none hilft dagegen nicht (Nils, 15.10.2026).
+  // Der Kursplan kommt trotzdem laufend, kurse.json wird alle 5 Minuten separat geholt.
+  var NEU_LADEN_STUNDE = 6;     // zwischen 6 und 7 Uhr
+  var NEU_LADEN_SPAETESTENS = 24; // Stunden: falls die Morgenstunde verpasst wurde
   var SCHALTER = {
     gutscheine: true           // false, falls die Gutscheine nicht rechtzeitig stehen (wie GUTSCHEINE_ZEIGEN im Aushang)
   };
@@ -1015,7 +1019,9 @@ p strong{color:#fff;font-weight:650}
   var geladen = Date.now();
   function vielleichtNeuLaden() {
     if (vorschau || location.protocol === 'file:') return;
-    if (Date.now() - geladen < NEU_LADEN_MINUTEN * 60 * 1000) return;
+    var alter = Date.now() - geladen, t = jetzt();
+    var morgens = t.getHours() === NEU_LADEN_STUNDE && alter > 60 * 60 * 1000;
+    if (!morgens && alter < NEU_LADEN_SPAETESTENS * 3600 * 1000) return;
     var x = new XMLHttpRequest();
     x.open('GET', location.pathname + '?pruefen=' + Date.now(), true);
     x.timeout = 15000;
