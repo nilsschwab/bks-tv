@@ -28,6 +28,10 @@
     ?tempo=4                   4 Sekunden je Folie
 
   Schrift: alles in rem, 1rem = 1 % der Breite einer 16:9-Flaeche. Skript bewusst in ES5.
+
+  Fotos in Folien mit data-src statt src einbinden: Sie laden erst, wenn die Folie drankommt.
+  Gezeichnet werden nur die aktive und die gerade ausblendende Folie, alle anderen ruhen
+  (display:none). Sonst gibt der Browser des Fernsehers auf (20.10.2026).
 -->
 <link rel="stylesheet" href="../schriften.css">
 <style>
@@ -61,6 +65,9 @@ body{font-family:'Inter',system-ui,sans-serif;font-synthesis:none;-webkit-font-s
   padding:4.2rem 5.5rem 2.6rem;display:grid;grid-template-columns:1.12fr 1fr;grid-gap:4.5rem;
   align-items:center;opacity:0;visibility:hidden;transition:opacity .9s ease, visibility 0s linear .9s}
 .folie.aktiv{opacity:1;visibility:visible;transition:opacity .9s ease, visibility 0s}
+/* Nur die aktive und die gerade ausblendende Folie werden gezeichnet (siehe zeige()).
+   !important, weil v-reihe & Co. weiter unten ihr eigenes display setzen. */
+.folie.ruht{display:none!important}
 
 .folie .ein{opacity:0;transform:translateY(1.2rem)}
 .folie.aktiv .ein{animation:rein .8s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--d, 0) * 90ms + 150ms)}
@@ -336,7 +343,7 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
     </table>
     <div class="quelle ein" style="--d:4;font-size:1.4rem;color:var(--text-2)">Vormittags ist meist kurzfristig ein Court frei.</div>
   </div>
-  <div class="hintergrund"><img src="../bilder/squash-court.jpg" alt=""></div>
+  <div class="hintergrund"><img data-src="../bilder/squash-court.jpg" alt=""></div>
 </section>
 
 <section class="folie v-panel" data-id="wellpass">
@@ -424,7 +431,7 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
     <p class="ein klein" style="--d:3;font-size:1.45rem">Wir lesen jede Rückmeldung und antworten auf jede. Ganz freiwillig – und wenn Ihnen etwas nicht gefällt, schreiben Sie es bitte ebenso offen oder sprechen Sie uns direkt an.</p>
   </div>
   <div class="karte hell qr ein" style="--d:2">
-    <img src="../bilder/qr-bewertung.svg" alt="QR-Code zur Google-Bewertung">
+    <img data-src="../bilder/qr-bewertung.svg" alt="QR-Code zur Google-Bewertung">
     <div class="unter">Code scannen und Ihre Erfahrung schildern</div>
   </div>
 </section>
@@ -447,7 +454,7 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
     <div class="kaufen ein" style="--d:5"><b>60&nbsp;€</b><span>60 Minuten, Court inklusive</span></div>
     <div class="quelle ein" style="--d:6;font-size:1.4rem;color:var(--text-2)">Termin am Empfang oder unter 07159&nbsp;45151</div>
   </div>
-  <div class="bild"><img src="../bilder/nils-schwab-bundesliga.jpg" alt="Nils Schwab in der Squash-Bundesliga" style="object-position:50% 25%"><span class="bildnachweis">Foto: Christian Lortat</span></div>
+  <div class="bild"><img data-src="../bilder/nils-schwab-bundesliga.jpg" alt="Nils Schwab in der Squash-Bundesliga" style="object-position:50% 25%"><span class="bildnachweis">Foto: Christian Lortat</span></div>
 </section>
 
 <section class="folie v-reihe" data-id="trainer-inhalt">
@@ -485,7 +492,7 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
     <div class="kaufen ein" style="--d:4"><b>69,90&nbsp;€</b><span>statt <s>99,95&nbsp;€</s> UVP</span></div>
     <div class="quelle ein" style="--d:5">Mit Vibra-Stopp. Angaben Dunlop</div>
   </div>
-  <div class="bild produkt" style="background:#ffffff"><img src="../bilder/schlaeger-tristorm-graphite.jpg" alt="Dunlop Tristorm Graphite"></div>
+  <div class="bild produkt" style="background:#ffffff"><img data-src="../bilder/schlaeger-tristorm-graphite.jpg" alt="Dunlop Tristorm Graphite"></div>
 </section>
 
 <section class="folie v-halb links" data-id="soniccore">
@@ -502,7 +509,7 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
     <div class="kaufen ein" style="--d:4"><b>89,90&nbsp;€</b><span>statt <s>159,95&nbsp;€</s> UVP</span></div>
     <div class="quelle ein" style="--d:5">Mit Dunlop Hydramax Pro Grip. Angaben Dunlop</div>
   </div>
-  <div class="bild produkt" style="background:#ededed"><img src="../bilder/schlaeger-soniccore-revelation-125.jpg" alt="Dunlop SonicCore Revelation 125"></div>
+  <div class="bild produkt" style="background:#ededed"><img data-src="../bilder/schlaeger-soniccore-revelation-125.jpg" alt="Dunlop SonicCore Revelation 125"></div>
 </section>
 
 <!-- Gutscheine: Verkauf ab 28.11., Preise bei Kauf bis 15.12. (wie im Aufenthaltsraum) -->
@@ -537,11 +544,11 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
     <div class="akzent ein" style="--d:2">Kommen Sie vorbei, oder erzählen Sie es weiter.</div>
     <p class="ein" style="--d:3">Bei uns trainieren Sie an Geräten, die genau auf Sie eingestellt werden. Während der ganzen Öffnungszeit ist ein Sporttherapeut auf der Fläche und hilft, wenn etwas nicht passt.</p>
     <div class="weiter ein" style="--d:4">
-      <div class="qrfeld"><img src="../bilder/qr-gesundheitstraining.svg" alt=""></div>
+      <div class="qrfeld"><img data-src="../bilder/qr-gesundheitstraining.svg" alt=""></div>
       <div><b>Kostenloses Erstgespräch</b><span>Rund 30 Minuten, unter <strong>07159&nbsp;45151</strong>. Code scannen und den Link speichern oder weiterschicken.</span></div>
     </div>
   </div>
-  <div class="bild"><img src="../bilder/schulteruebung.jpg" alt=""></div>
+  <div class="bild"><img data-src="../bilder/schulteruebung.jpg" alt=""></div>
 </section>
 
 <section class="folie v-halb links familie" data-reihe="familie">
@@ -551,11 +558,11 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
     <div class="akzent ein" style="--d:2">Genau dafür ist das Training da.</div>
     <p class="ein" style="--d:3">Kraft und Gleichgewicht lassen mit den Jahren nach, wenn man nichts dafür tut. In der Ersttestung messen wir, wo Sie stehen, und bauen daraus Ihren Trainingsplan.</p>
     <div class="weiter ein" style="--d:4">
-      <div class="qrfeld"><img src="../bilder/qr-gesundheitstraining.svg" alt=""></div>
+      <div class="qrfeld"><img data-src="../bilder/qr-gesundheitstraining.svg" alt=""></div>
       <div><b>Kostenloses Erstgespräch</b><span>Rund 30 Minuten, unter <strong>07159&nbsp;45151</strong>. Code scannen und den Link speichern oder weiterschicken.</span></div>
     </div>
   </div>
-  <div class="bild"><img src="../bilder/seilzug-praevention.jpg" alt=""></div>
+  <div class="bild"><img data-src="../bilder/seilzug-praevention.jpg" alt=""></div>
 </section>
 
 <section class="folie v-panel familie" data-reihe="familie">
@@ -565,7 +572,7 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
     <p class="ein" style="--d:2">Übungen für Gleichgewicht und Kraft senken bei älteren Menschen die Zahl der Stürze um fast ein Viertel. Bei uns gibt es dafür den Kurs Sturzprophylaxe.</p>
     <div class="quelle ein" style="--d:3;margin-top:0">Cochrane-Review, Sherrington u. a., 2019</div>
     <div class="weiter ein" style="--d:4">
-      <div class="qrfeld"><img src="../bilder/qr-gesundheitstraining.svg" alt=""></div>
+      <div class="qrfeld"><img data-src="../bilder/qr-gesundheitstraining.svg" alt=""></div>
       <div><b>Kostenloses Erstgespräch</b><span>Rund 30 Minuten, unter <strong>07159&nbsp;45151</strong>. Code scannen und den Link speichern oder weiterschicken.</span></div>
     </div>
   </div>
@@ -582,11 +589,11 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
     <div class="akzent ein" style="--d:2">Hier geht es weiter.</div>
     <p class="ein" style="--d:3">Nach einer Operation oder Verletzung fehlt oft noch Kraft. Bei uns geht das Training begleitet weiter, auf Wunsch auch in Einzelsitzungen mit einem Sporttherapeuten.</p>
     <div class="weiter ein" style="--d:4">
-      <div class="qrfeld"><img src="../bilder/qr-gesundheitstraining.svg" alt=""></div>
+      <div class="qrfeld"><img data-src="../bilder/qr-gesundheitstraining.svg" alt=""></div>
       <div><b>Kostenloses Erstgespräch</b><span>Rund 30 Minuten, unter <strong>07159&nbsp;45151</strong>. Code scannen und den Link speichern oder weiterschicken.</span></div>
     </div>
   </div>
-  <div class="bild"><img src="../bilder/einzelsitzung.jpg" alt=""></div>
+  <div class="bild"><img data-src="../bilder/einzelsitzung.jpg" alt=""></div>
 </section>
 
 <!-- Rehasport-Zeiten wie Website /rehasport-in-magstadt, Stand 15.10.2026 -->
@@ -604,7 +611,7 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
     </div>
     <div class="hinweis ein" style="--d:4">Anmeldung am Empfang oder unter 07159&nbsp;45151</div>
   </div>
-  <div class="bild"><img src="../bilder/rehasport-gruppe.jpg" alt="" style="object-position:38% 40%"></div>
+  <div class="bild"><img data-src="../bilder/rehasport-gruppe.jpg" alt="" style="object-position:38% 40%"></div>
 </section>
 
 <!-- ================================================================
@@ -1225,7 +1232,34 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
   alle.forEach(function (f) {
     var r = f.getAttribute('data-reihe');
     if (r) (reihen[r] = reihen[r] || []).push(f);
+    // Alle Folien ruhen (display:none), bis sie drankommen. Mit allen 33 Folien und
+    // 14 Fotos auf einmal hat der Browser des Fernsehers im Squashbereich aufgegeben:
+    // Folien unvollstaendig, danach weisse Fehlerseite (Nils, 20.10.2026).
+    f.classList.add('ruht');
   });
+
+  // Fotos stehen als data-src im HTML und laden erst, wenn ihre Folie das erste Mal kommt
+  function bilderLaden(f) {
+    [].forEach.call(f.querySelectorAll('img[data-src]'), function (b) {
+      b.setAttribute('src', b.getAttribute('data-src'));
+      b.removeAttribute('data-src');
+    });
+  }
+  // Nach dem Laden der Seite die Fotos einzeln vorladen, damit keins erst beim Einblenden nachkommt
+  function vorladen() {
+    var urls = [];
+    [].forEach.call(document.querySelectorAll('img[data-src]'), function (b) {
+      var u = b.getAttribute('data-src');
+      if (urls.indexOf(u) < 0) urls.push(u);
+    });
+    var i = 0;
+    (function eins() {
+      if (i >= urls.length) return;
+      var b = new Image();
+      b.onload = b.onerror = function () { setTimeout(eins, 1000); };
+      b.src = urls[i++];
+    })();
+  }
 
   function sichtbar(f) {
     var t = jetzt();
@@ -1272,9 +1306,19 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
 
   var fussWechsel = true;
   function zeige(f) {
-    if (aktiv && aktiv !== f) aktiv.classList.remove('aktiv');
+    var alt = aktiv;
+    if (alt && alt !== f) {
+      alt.classList.remove('aktiv');
+      // Nach dem Ausblenden (0,9 s) wieder ruhen lassen
+      setTimeout(function () { if (alt !== aktiv) alt.classList.add('ruht'); }, 1000);
+    }
     if (aufTimer) { clearTimeout(aufTimer); aufTimer = null; }
     f.classList.remove('aufgeloest');
+    bilderLaden(f);
+    if (f.classList.contains('ruht')) {
+      f.classList.remove('ruht');
+      void f.offsetWidth;   // erst mit Deckkraft 0 zeichnen, sonst blendet die Folie nicht weich ein
+    }
     aktiv = f;
     f.classList.add('aktiv');
     var s = tempo || +(f.getAttribute('data-dauer') || lesezeit(f));
@@ -1330,6 +1374,7 @@ svg.court{display:block;width:25.1rem;height:38.8rem;overflow:visible}
   setInterval(vielleichtNeuLaden, 60 * 1000);
   try { if (navigator.wakeLock) navigator.wakeLock.request('screen').catch(function () { }); } catch (e) { }
   if (standbild === null) animieren();   // Standbild: einmal gezeichnet, keine Dauerschleife
+  window.addEventListener('load', vorladen);
 
   var fest = parameter('folie');
   if (fest) {
