@@ -1,91 +1,11 @@
 {
- "stand": "2026-10-25T09:09:56.142Z",
+ "stand": "2026-10-26T10:08:45.504Z",
  "quelle": "https://bks.virtuagym.com/classes",
  "wochen": [
-  "2026-10-19",
-  "2026-10-26"
+  "2026-10-26",
+  "2026-11-02"
  ],
  "kurse": [
-  {
-   "datum": "2026-10-19",
-   "start": "11:30",
-   "ende": "12:30",
-   "titel": "Wirbelsäulengymnastik",
-   "trainer": "Riccardo Garofano",
-   "farbe": "#FEB74D",
-   "abgesagt": false,
-   "voll": false
-  },
-  {
-   "datum": "2026-10-19",
-   "start": "20:30",
-   "ende": "21:30",
-   "titel": "Mobilitätstraining",
-   "trainer": "Vito Garofano",
-   "farbe": "#DCE673",
-   "abgesagt": false,
-   "voll": false
-  },
-  {
-   "datum": "2026-10-20",
-   "start": "09:30",
-   "ende": "10:30",
-   "titel": "Sturzprophylaxe",
-   "trainer": "Riccardo Garofano",
-   "farbe": "#BB68C8",
-   "abgesagt": false,
-   "voll": false
-  },
-  {
-   "datum": "2026-10-20",
-   "start": "19:00",
-   "ende": "20:00",
-   "titel": "Wirbelsäulengymnastik",
-   "trainer": "Vito Garofano",
-   "farbe": "#FEB74D",
-   "abgesagt": false,
-   "voll": false
-  },
-  {
-   "datum": "2026-10-21",
-   "start": "11:30",
-   "ende": "12:30",
-   "titel": "Mobilitätstraining",
-   "trainer": "Riccardo Garofano",
-   "farbe": "#DCE673",
-   "abgesagt": false,
-   "voll": false
-  },
-  {
-   "datum": "2026-10-22",
-   "start": "20:30",
-   "ende": "21:30",
-   "titel": "Ganzkörpertraining",
-   "trainer": "Vito Garofano",
-   "farbe": "#BB68C8",
-   "abgesagt": false,
-   "voll": false
-  },
-  {
-   "datum": "2026-10-23",
-   "start": "09:30",
-   "ende": "10:30",
-   "titel": "Wirbelsäulengymnastik",
-   "trainer": "Riccardo Garofano",
-   "farbe": "#FEB74D",
-   "abgesagt": false,
-   "voll": false
-  },
-  {
-   "datum": "2026-10-23",
-   "start": "19:30",
-   "ende": "20:30",
-   "titel": "Aerobic",
-   "trainer": "Vito Garofano",
-   "farbe": "#ED5D60",
-   "abgesagt": false,
-   "voll": false
-  },
   {
    "datum": "2026-10-26",
    "start": "11:30",
@@ -158,6 +78,86 @@
   },
   {
    "datum": "2026-10-30",
+   "start": "19:30",
+   "ende": "20:30",
+   "titel": "Aerobic",
+   "trainer": "Vito Garofano",
+   "farbe": "#ED5D60",
+   "abgesagt": false,
+   "voll": false
+  },
+  {
+   "datum": "2026-11-02",
+   "start": "11:30",
+   "ende": "12:30",
+   "titel": "Wirbelsäulengymnastik",
+   "trainer": "Riccardo Garofano",
+   "farbe": "#FEB74D",
+   "abgesagt": false,
+   "voll": false
+  },
+  {
+   "datum": "2026-11-02",
+   "start": "20:30",
+   "ende": "21:30",
+   "titel": "Mobilitätstraining",
+   "trainer": "Vito Garofano",
+   "farbe": "#DCE673",
+   "abgesagt": false,
+   "voll": false
+  },
+  {
+   "datum": "2026-11-03",
+   "start": "09:30",
+   "ende": "10:30",
+   "titel": "Sturzprophylaxe",
+   "trainer": "Riccardo Garofano",
+   "farbe": "#BB68C8",
+   "abgesagt": false,
+   "voll": false
+  },
+  {
+   "datum": "2026-11-03",
+   "start": "19:00",
+   "ende": "20:00",
+   "titel": "Wirbelsäulengymnastik",
+   "trainer": "Vito Garofano",
+   "farbe": "#FEB74D",
+   "abgesagt": false,
+   "voll": false
+  },
+  {
+   "datum": "2026-11-04",
+   "start": "11:30",
+   "ende": "12:30",
+   "titel": "Mobilitätstraining",
+   "trainer": "Riccardo Garofano",
+   "farbe": "#DCE673",
+   "abgesagt": false,
+   "voll": false
+  },
+  {
+   "datum": "2026-11-05",
+   "start": "20:30",
+   "ende": "21:30",
+   "titel": "Ganzkörpertraining",
+   "trainer": "Vito Garofano",
+   "farbe": "#BB68C8",
+   "abgesagt": false,
+   "voll": false
+  },
+  {
+   "datum": "2026-11-06",
+   "start": "09:30",
+   "ende": "10:30",
+   "titel": "Wirbelsäulengymnastik",
+   "trainer": "Riccardo Garofano",
+   "farbe": "#FEB74D",
+   "abgesagt": false,
+   "voll": false
+  },
+  {
+   "datum": "2026-11-06",
    "start": "19:30",
    "ende": "20:30",
    "titel": "Aerobic",
