@@ -1,0 +1,1650 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Gesundheitstraining an Geräten · Wissensteile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Instrument+Serif:ital@0;1&display=swap">
+<style>
+
+html, body { margin: 0; height: 100%; background: #0E1024; overflow: hidden; }
+p, h1, h2, h3, ul, ol { margin: 0; }
+img { display: block; }
+#rahmen { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: 0 0; }
+#rahmen > section { display: none; position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; }
+#rahmen > section.aktiv { display: flex; }
+
+/* Frage: erst nur Dachzeile und Frage, dann der Folieninhalt */
+section[data-frage].verdeckt > :not(.kopf):not(.fuss):not(.frage-zeichen) { visibility: hidden; }
+section[data-frage].verdeckt .kopf > :not(.dach):not(.titel) { visibility: hidden; }
+section[data-frage] .frage-zeichen { display: none; position: absolute; right: 128px; bottom: 120px;
+  font-family: 'Instrument Serif', Georgia, serif; font-size: 520px; line-height: 1; color: var(--hell2); }
+section[data-frage].verdeckt .frage-zeichen { display: block; }
+section[data-frage].aufgedeckt > :not(.kopf):not(.fuss),
+section[data-frage].aufgedeckt .kopf > :not(.dach):not(.titel) { animation: rein 600ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+/* Startseite */
+section.start { background: var(--hell); padding: 96px 128px 120px; gap: 40px; }
+.start-kopf { display: flex; justify-content: space-between; align-items: flex-start; }
+.start-logo { width: 360px; height: 145px; object-fit: contain; }
+.start .gross { font-size: 112px; }
+.raster { display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; }
+.kachel-e { all: unset; box-sizing: border-box; background: var(--feld); border-radius: 24px; padding: 28px 28px 32px;
+  display: flex; flex-direction: column; gap: 14px; min-height: 260px; cursor: pointer; border: 4px solid transparent; }
+.kachel-e:focus, .kachel-e:hover { border-color: var(--indigo); background: #fff; outline: none; }
+.k-nr { font-family: 'Instrument Serif', Georgia, serif; font-size: 96px; line-height: 1; color: var(--indigo); }
+.k-text { display: flex; flex-direction: column; gap: 8px; }
+.k-titel { font-family: 'Inter', Arial, sans-serif; font-size: 28px; line-height: 1.2; font-weight: 600; color: var(--tinte); }
+.k-unter { font-family: 'Inter', Arial, sans-serif; font-size: 22px; line-height: 1.25; color: var(--leise); }
+.start-fuss { display: flex; justify-content: space-between; align-items: center; }
+.start-fuss p { font-size: 24px; color: var(--leise); }
+.knopf { all: unset; cursor: pointer; font-family: 'Inter', Arial, sans-serif; font-size: 24px; font-weight: 600; color: var(--indigo);
+  border: 3px solid var(--indigo); border-radius: 40px; padding: 12px 28px; }
+.knopf:focus, .knopf:hover { background: var(--indigo); color: var(--hell); outline: none; }
+
+/* Steuerleiste unten in der Mitte, dezent */
+#leiste { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: none; gap: 6px; align-items: center;
+  font-family: 'Inter', Arial, sans-serif; font-size: 22px; color: var(--leise); background: rgba(255,255,255,0.55);
+  border-radius: 30px; padding: 4px 8px; opacity: 0.45; z-index: 5; }
+#leiste:hover { opacity: 1; }
+#leiste button { all: unset; cursor: pointer; padding: 6px 16px; border-radius: 20px; color: var(--tinte); }
+#leiste button:hover, #leiste button:focus { background: var(--hell2); outline: none; }
+#leiste .stand { padding: 0 8px; min-width: 80px; text-align: center; }
+
+#hinweis { position: absolute; left: 50%; top: 40px; transform: translateX(-50%); z-index: 6; display: none;
+  font-family: 'Inter', Arial, sans-serif; font-size: 28px; color: var(--hell); background: var(--tinte);
+  border-radius: 16px; padding: 18px 32px; }
+#tasten { position: absolute; right: 20px; top: 20px; z-index: 7; display: none; font: 600 28px Arial, sans-serif;
+  color: #fff; background: #B4472F; padding: 10px 18px; border-radius: 10px; }
+
+/* ---- Foliensatz (project/deck.css) ---- */
+:root {
+  --hell: #F7F8FC;
+  --feld: #E9EEF8;
+  --tinte: #151831;
+  --text: #3F4560;
+  --leise: #5F6680;
+  --indigo: #3D4BA7;
+  --hellblau: #5894D5;
+  --hell2: #D6DDF5;
+  --nachtfeld: #262B52;
+  --warn: #B4472F;
+  --warnfeld: #F8E9E4;
+}
+
+body { font-family: 'Inter', Arial, sans-serif; color: var(--text); }
+
+section {
+  background: var(--hell);
+  padding: 128px 128px 160px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+p { font-size: 32px; line-height: 1.4; }
+h3 { font-family: 'Inter', Arial, sans-serif; font-size: 44px; font-weight: 600; line-height: 1.15; color: var(--tinte); }
+
+/* Kopf jeder Inhaltsfolie */
+.kopf { display: flex; flex-direction: column; gap: 16px; }
+.dach { font-size: 24px; line-height: 1.2; font-weight: 600; color: var(--indigo); letter-spacing: 2px; }
+.titel { font-family: 'Instrument Serif', Georgia, serif; font-size: 72px; font-weight: 400; line-height: 1.05; color: var(--tinte); }
+.lead { font-size: 32px; line-height: 1.4; color: var(--text); }
+
+/* Fußzeile */
+.fuss { position: absolute; left: 128px; bottom: 64px; width: 1664px; display: flex; justify-content: space-between; }
+.fuss p { font-size: 24px; line-height: 1.2; color: var(--leise); }
+
+/* Raster und Karten */
+.reihe { display: grid; gap: 32px; }
+.r2 { grid-template-columns: 1fr 1fr; }
+.r3 { grid-template-columns: 1fr 1fr 1fr; }
+.r4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.r5 { grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 24px; }
+.spalte { display: flex; flex-direction: column; gap: 20px; }
+.zweispaltig { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+
+.karte { background: var(--feld); border-radius: 24px; padding: 40px 44px; display: flex; flex-direction: column; gap: 16px; box-sizing: border-box; }
+.karte.weiss { background: var(--hell); }
+.karte.warnung { background: var(--warnfeld); border-left: 12px solid var(--warn); }
+.karte.dunkelkarte { background: var(--tinte); }
+.karte.blaukarte { background: var(--indigo); }
+
+.kt { font-size: 32px; line-height: 1.3; font-weight: 600; color: var(--tinte); }
+.kl { font-size: 24px; line-height: 1.2; font-weight: 600; color: var(--indigo); letter-spacing: 1px; }
+.kl.warnton { color: var(--warn); }
+.zahl { font-family: 'Instrument Serif', Georgia, serif; font-size: 144px; line-height: 1; color: var(--indigo); }
+.symbol { width: 112px; height: 112px; color: var(--indigo); }
+.symbol-klein { width: 64px; height: 64px; color: var(--warn); }
+
+.dunkelkarte .kt { color: var(--hell); }
+.dunkelkarte .lead { color: var(--hell2); }
+.dunkelkarte .kl { color: var(--hellblau); }
+.blaukarte .kt { color: var(--hell); }
+.blaukarte .lead { color: var(--hell2); }
+
+/* Aufzählung */
+ul.liste { font-size: 32px; line-height: 1.4; color: var(--text); padding-left: 44px; }
+ul.liste li { margin-bottom: 14px; }
+
+/* Merksatz mit Linie */
+.merksatz { border-left: 8px solid var(--hellblau); padding: 8px 0 8px 36px; }
+.merksatz .ms { font-family: 'Instrument Serif', Georgia, serif; font-size: 44px; line-height: 1.2; color: var(--tinte); }
+
+/* Pillen */
+.pille { align-self: flex-start; background: var(--feld); color: var(--tinte); border-radius: 40px; padding: 14px 32px; font-size: 32px; line-height: 1.3; }
+
+/* Nummernkreis */
+.nr { width: 64px; height: 64px; border-radius: 32px; background: var(--indigo); color: var(--hell); font-size: 32px; line-height: 64px; font-weight: 600; text-align: center; flex-shrink: 0; }
+.nr-zeile { display: flex; align-items: center; gap: 28px; }
+.nr-text { font-size: 32px; line-height: 1.35; color: var(--text); }
+
+/* Titelfolie */
+section.titelfolie { justify-content: space-between; padding: 112px 128px 160px; }
+.titel-band { position: absolute; left: 0; top: 1040px; width: 1920px; height: 40px; background: linear-gradient(90deg, #5894D5, #3D4BA7); }
+.titel-logo { width: 420px; height: 169px; object-fit: contain; }
+.titel-text { display: flex; flex-direction: column; gap: 24px; }
+.gross { font-family: 'Instrument Serif', Georgia, serif; font-size: 144px; font-weight: 400; line-height: 1; color: var(--tinte); }
+
+/* Einheiten-Trenner (dunkel) */
+section.einheit { background: var(--tinte); justify-content: flex-end; gap: 40px; }
+.riesenzahl { position: absolute; right: 128px; top: 40px; width: 720px; text-align: right; font-family: 'Instrument Serif', Georgia, serif; font-size: 400px; line-height: 1; color: var(--hellblau); }
+.einheit .dach { color: var(--hellblau); }
+.einheit .titel { color: var(--hell); }
+.untertitel { font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-size: 44px; line-height: 1.2; color: var(--hell2); }
+.heute { display: flex; flex-direction: column; gap: 12px; }
+.heute-label { font-size: 24px; line-height: 1.2; font-weight: 600; letter-spacing: 2px; color: var(--hellblau); }
+.einheit ul.liste { color: var(--hell2); }
+.einheit .pille { background: var(--nachtfeld); color: var(--hell2); }
+.einheit .fuss p { color: #9AA3C7; }
+
+/* Aussage-Folie (Indigo) */
+section.aussage { background: var(--indigo); justify-content: center; gap: 40px; }
+.aussage .dach { color: #C9D3F2; }
+.satz { font-family: 'Instrument Serif', Georgia, serif; font-size: 72px; line-height: 1.12; color: var(--hell); width: 1400px; }
+.folge { font-size: 32px; line-height: 1.45; color: var(--hell2); width: 1200px; }
+.aussage .fuss p { color: #C9D3F2; }
+
+/* Wochenaufgabe */
+section.aufgabe { background: var(--feld); }
+.aufgaben { display: flex; flex-direction: column; gap: 20px; }
+.aufgabe-zeile { display: flex; align-items: center; gap: 32px; background: var(--hell); border-radius: 20px; padding: 28px 40px; }
+.kaestchen { width: 44px; height: 44px; border: 4px solid var(--indigo); border-radius: 10px; box-sizing: border-box; flex-shrink: 0; }
+.aufgabe-text { font-size: 32px; line-height: 1.4; color: var(--tinte); }
+
+/* Borg-Skala */
+.skala { display: grid; grid-template-columns: repeat(15, 1fr); gap: 8px; }
+.stufe { height: 120px; border-radius: 12px; background: var(--feld); display: flex; align-items: center; justify-content: center; }
+.stufe.ziel { background: var(--indigo); }
+.stufe-zahl { font-size: 44px; line-height: 1; font-weight: 600; color: var(--tinte); }
+.ziel .stufe-zahl { color: var(--hell); }
+.skala-text { font-size: 32px; line-height: 1.25; color: var(--text); }
+.skala-ziel { font-size: 32px; line-height: 1.25; font-weight: 600; color: var(--indigo); text-align: center; }
+
+/* Wiederholungsreserve */
+.wdh { display: flex; gap: 12px; }
+.wdh-box { width: 72px; height: 72px; border-radius: 12px; background: var(--indigo); flex-shrink: 0; }
+.wdh-box.reserve { background: var(--hell); border: 4px dashed var(--indigo); box-sizing: border-box; }
+.wdh-label { display: flex; gap: 12px; }
+
+/* Wochendosis */
+.woche { display: grid; grid-template-columns: 380px repeat(7, 1fr); gap: 10px; align-items: center; }
+.tag { font-size: 24px; line-height: 1.2; font-weight: 600; color: var(--leise); text-align: center; }
+.feld-aus { height: 88px; border-radius: 12px; background: var(--feld); }
+.feld-an { height: 88px; border-radius: 12px; background: var(--indigo); display: flex; align-items: center; justify-content: center; }
+.feld-an .minuten { font-size: 32px; line-height: 1; font-weight: 600; color: var(--hell); }
+.woche-label { font-size: 32px; line-height: 1.25; font-weight: 600; color: var(--tinte); }
+
+/* Pfeile */
+.pfeil { width: 120px; height: 60px; background: var(--hellblau); }
+.pfeil-klein { width: 72px; height: 36px; background: var(--hellblau); }
+
+/* Zeichnungen */
+.zeichnung { position: relative; }
+
+/* Zeilen mit Nummer als Karte */
+.zeilenkarte { background: var(--feld); border-radius: 16px; padding: 12px 24px; }
+.symbol-gross { width: 144px; height: 144px; color: var(--indigo); }
+
+/* Tabelle */
+.tabelle { font-family: 'Inter', Arial, sans-serif; font-size: 32px; color: var(--tinte); width: 1664px; }
+.tabelle .kopfzeile { background: var(--feld); }
+.tabelle .ohne { color: var(--indigo); }
+
+.karte.kompakt { padding: 28px 36px; gap: 8px; }
+.aufgabe .pille { background: var(--hell); }
+.blaukarte .zahl { color: var(--hell); }
+.skala-block { display: flex; flex-direction: column; gap: 12px; }
+.info { display: flex; flex-direction: column; gap: 4px; }
+.kachel { background: var(--feld); border-radius: 20px; padding: 28px 32px; display: flex; align-items: center; gap: 24px; }
+ol.liste { font-size: 32px; line-height: 1.4; color: var(--text); padding-left: 48px; }
+ol.liste li { margin-bottom: 14px; }
+.kette { display: grid; grid-template-columns: 1fr 72px 1fr 72px 1fr; gap: 24px; align-items: center; }
+.gg { display: grid; grid-template-columns: 1fr 120px 1fr; gap: 40px; align-items: center; }
+.blaukarte h3 { color: var(--hell); }
+.blaukarte .kl { color: #C9D3F2; }
+.dunkelkarte .ms { font-family: 'Instrument Serif', Georgia, serif; font-size: 44px; line-height: 1.2; color: var(--hell); }
+.luecke { display: grid; grid-template-columns: 1fr 360px 1fr; gap: 0px; align-items: stretch; }
+.luecke-mitte { border-top: 4px dashed var(--hellblau); border-bottom: 4px dashed var(--hellblau); display: flex; align-items: center; justify-content: center; }
+.frage { padding: 28px 20px; align-items: center; }
+.frage .lead { text-align: center; }
+.frage h3 { text-align: center; }
+.haken { width: 56px; height: 56px; color: var(--indigo); flex-shrink: 0; }
+.danke-logo { position: absolute; right: 128px; top: 112px; width: 400px; height: 160px; object-fit: contain; }
+.dunkelkarte h3 { color: var(--hell); }
+.nowrap { white-space: nowrap; }
+
+/* Tandem */
+.tandem { display: grid; grid-template-columns: 1fr 280px 1fr; gap: 32px; align-items: center; }
+.tandem-mitte { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.tandem-text { font-size: 24px; line-height: 1.3; font-weight: 600; color: var(--indigo); text-align: center; }
+
+/* Ankunft */
+@keyframes rein { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0px); } }
+.rein { animation: rein 500ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 100ms); }
+
+</style>
+</head>
+<body>
+<div id="rahmen">
+
+<section id="start" class="start">
+<div class="start-kopf">
+<div class="titel-text">
+<p class="dach">Präventionskurs · Wissensteile</p>
+<h1 class="gross">Gesundheitstraining an Geräten</h1>
+</div>
+<img class="start-logo" src="logo-vollfarbe.png" alt="Logo Bewegungszentrum für Körperwohl und Squash">
+</div>
+<div class="raster">
+<button class="kachel-e" data-ziel="e1-titel">
+<span class="k-nr">1</span>
+<span class="k-text"><span class="k-titel">Ankommen: Bewegung wirkt</span><span class="k-unter">Zwei Wege zum Ziel</span></span>
+</button>
+<button class="kachel-e" data-ziel="e2-titel">
+<span class="k-nr">2</span>
+<span class="k-text"><span class="k-titel">Kraft für Beine und Rücken</span><span class="k-unter">Aufstehen und Heranziehen</span></span>
+</button>
+<button class="kachel-e" data-ziel="e3-titel">
+<span class="k-nr">3</span>
+<span class="k-text"><span class="k-titel">Drücken und Ziehen</span><span class="k-unter">Der Oberkörper</span></span>
+</button>
+<button class="kachel-e" data-ziel="e4-titel">
+<span class="k-nr">4</span>
+<span class="k-text"><span class="k-titel">Die Mitte stärken</span><span class="k-unter">Aufrichten und Einrollen</span></span>
+</button>
+<button class="kachel-e" data-ziel="e5-titel">
+<span class="k-nr">5</span>
+<span class="k-text"><span class="k-titel">Ausdauer verstehen und steuern</span><span class="k-unter">Herz, Kreislauf und Alltagswege</span></span>
+</button>
+<button class="kachel-e" data-ziel="e6-titel">
+<span class="k-nr">6</span>
+<span class="k-text"><span class="k-titel">Beweglich und sicher</span><span class="k-unter">Dehnfähigkeit und Koordination</span></span>
+</button>
+<button class="kachel-e" data-ziel="e7-titel">
+<span class="k-nr">7</span>
+<span class="k-text"><span class="k-titel">Anspannung und Entspannung</span><span class="k-unter">Das Entspannungsmodul</span></span>
+</button>
+<button class="kachel-e" data-ziel="e8-titel">
+<span class="k-nr">8</span>
+<span class="k-text"><span class="k-titel">Bewegung im Alltag</span><span class="k-unter">Sitzen, Arbeiten, Wege</span></span>
+</button>
+<button class="kachel-e" data-ziel="e9-titel">
+<span class="k-nr">9</span>
+<span class="k-text"><span class="k-titel">Mein Programm für danach</span><span class="k-unter">Pläne, die halten</span></span>
+</button>
+<button class="kachel-e" data-ziel="e10-titel">
+<span class="k-nr">10</span>
+<span class="k-text"><span class="k-titel">Weitermachen</span><span class="k-unter">Abschluss und Ausblick</span></span>
+</button>
+</div>
+<div class="start-fuss">
+<p>Weiter: Mitteltaste oder Klick · Zurück: Zurück-Taste · Frage auflösen: noch einmal weiter</p>
+<button class="knopf" id="vollbild">Vollbild</button>
+</div>
+</section>
+<section data-einheit="1" id="e1-titel" class="einheit">
+<p class="riesenzahl">1</p>
+<div class="kopf">
+<p class="dach">Einheit 1 von 10</p>
+<h2 class="titel">Ankommen: Bewegung wirkt</h2>
+<p class="untertitel">Zwei Wege zum Ziel</p>
+</div>
+<div class="heute">
+<p class="heute-label">Heute</p>
+<ul class="liste">
+<li>Warum Bewegung wirkt und wie viel empfohlen wird</li>
+<li>Das Kursprinzip: sechs Grundbewegungen im Tandem</li>
+<li>Sicherheit und Belastung richtig steuern</li>
+</ul>
+</div>
+<p class="pille">Vorstellungsrunde: Name, bisherige Bewegung, Erwartung an den Kurs</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 1</p></div>
+
+</section>
+<section data-einheit="1" id="e1-ablauf">
+<div class="kopf">
+<p class="dach">Einheit 1 · Der Kurs auf einen Blick</p>
+<h2 class="titel">Zehn Einheiten, ein Ziel</h2>
+<p class="lead">Jede Stunde: 12 Minuten Wissen · 38 Minuten Training · 10 Minuten Lockerung und Wochenaufgabe</p>
+</div>
+<div class="reihe r2">
+<div class="spalte">
+<div class="nr-zeile zeilenkarte"><p class="nr">1</p><p class="nr-text">Ankommen: Bewegung wirkt</p></div>
+<div class="nr-zeile zeilenkarte"><p class="nr">2</p><p class="nr-text">Kraft für Beine und Rücken</p></div>
+<div class="nr-zeile zeilenkarte"><p class="nr">3</p><p class="nr-text">Drücken und Ziehen: der Oberkörper</p></div>
+<div class="nr-zeile zeilenkarte"><p class="nr">4</p><p class="nr-text">Die Mitte stärken</p></div>
+<div class="nr-zeile zeilenkarte"><p class="nr">5</p><p class="nr-text">Ausdauer verstehen und steuern</p></div>
+</div>
+<div class="spalte">
+<div class="nr-zeile zeilenkarte"><p class="nr">6</p><p class="nr-text">Beweglich und sicher</p></div>
+<div class="nr-zeile zeilenkarte"><p class="nr">7</p><p class="nr-text">Anspannung und Entspannung</p></div>
+<div class="nr-zeile zeilenkarte"><p class="nr">8</p><p class="nr-text">Bewegung im Alltag</p></div>
+<div class="nr-zeile zeilenkarte"><p class="nr">9</p><p class="nr-text">Mein Programm für danach</p></div>
+<div class="nr-zeile zeilenkarte"><p class="nr">10</p><p class="nr-text">Weitermachen</p></div>
+</div>
+</div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 1</p></div>
+
+</section>
+<section data-einheit="1" id="e1-risiko">
+<div class="kopf">
+<p class="dach">Einheit 1 · Wissen</p>
+<h2 class="titel">Bewegungsmangel ist ein Risikofaktor</h2>
+<p class="lead">Wer sich wenig bewegt, hat ein höheres Risiko – für Krankheiten und dafür, im Alter weniger selbstständig zu sein.</p>
+</div>
+<div class="reihe r2">
+<div class="karte rein" style="--i:1"><h3>Herz und Kreislauf</h3></div>
+<div class="karte rein" style="--i:2"><h3>Stoffwechsel, z. B. Diabetes</h3></div>
+<div class="karte rein" style="--i:3"><h3>Rücken, Muskeln, Gelenke</h3></div>
+<div class="karte rein" style="--i:4"><h3>Selbstständigkeit im Alter</h3></div>
+</div>
+<div class="merksatz"><p class="ms">Der größte Gewinn liegt im ersten Schritt – von wenig zu etwas mehr Bewegung.</p></div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 1</p></div>
+
+</section>
+<section data-einheit="1" id="e1-empfehlung" data-frage="1">
+<div class="kopf">
+<p class="dach">Einheit 1 · Frage an Sie</p>
+<h2 class="titel">Wie viel Bewegung pro Woche empfehlen Fachleute?</h2>
+</div>
+<div class="reihe r3">
+<div class="karte rein" style="--i:1">
+<p class="zahl">150</p>
+<p class="kt">Minuten pro Woche in Bewegung</p>
+<p class="lead">bei der Sie etwas schneller atmen, z. B. 5 × 30 Minuten zügig gehen</p>
+</div>
+<div class="karte rein" style="--i:2">
+<p class="zahl">2</p>
+<p class="kt">Tage pro Woche für die Muskelkraft</p>
+<p class="lead">zusätzlich zur Ausdauer</p>
+</div>
+<div class="karte rein" style="--i:3">
+<svg class="symbol-gross" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+<p class="kt">Langes Sitzen unterbrechen</p>
+<p class="lead">z. B. jede halbe bis volle Stunde kurz aufstehen</p>
+</div>
+</div>
+<div class="merksatz"><p class="lead">Nur etwa jede fünfte Frau und jeder vierte Mann schaffen beides.</p></div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 1</p></div>
+
+<p class="frage-zeichen" aria-hidden="true">?</p>
+</section>
+<section data-einheit="1" id="e1-zwei-wege">
+<div class="kopf">
+<p class="dach">Einheit 1 · Kursprinzip</p>
+<h2 class="titel">Sechs Grundbewegungen – zwei Wege</h2>
+</div>
+<table class="tabelle">
+<tr class="kopfzeile"><th style="width:24%">Grundbewegung</th><th style="width:30%">Am Gerät</th><th style="width:46%">Ohne Gerät</th></tr>
+<tr><td>Aufstehen</td><td>Beinpresse</td><td class="ohne">Kniebeuge zum Stuhl</td></tr>
+<tr><td>Heranziehen</td><td>Rudergerät</td><td class="ohne">Einarmiges Rudern</td></tr>
+<tr><td>Wegdrücken</td><td>Brustpresse</td><td class="ohne">Liegestütz an der Wand</td></tr>
+<tr><td>Herunterziehen</td><td>Latzug</td><td class="ohne">Handtuchzug über Kopf</td></tr>
+<tr><td>Aufrichten</td><td>Rückenstrecker</td><td class="ohne">Diagonales Strecken im Vierfüßlerstand</td></tr>
+<tr><td>Einrollen</td><td>Bauchtrainer</td><td class="ohne">Crunch</td></tr>
+</table>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 1</p></div>
+
+</section>
+<section data-einheit="1" id="e1-tandem">
+<div class="kopf">
+<p class="dach">Einheit 1 · Kursprinzip</p>
+<h2 class="titel">Im Tandem trainieren</h2>
+</div>
+<div class="tandem">
+<div class="karte rein" style="--i:1">
+<p class="kl">Person A</p>
+<h3>am Gerät</h3>
+<p class="lead">z. B. Beinpresse, 12 bis 15 Wiederholungen</p>
+</div>
+<div class="tandem-mitte">
+<x-shape kind="arrow-right" class="pfeil"></x-shape>
+<p class="tandem-text">gleich oft,<br>dann Tausch</p>
+<x-shape kind="arrow-left" class="pfeil"></x-shape>
+</div>
+<div class="karte rein" style="--i:2">
+<p class="kl">Person B</p>
+<h3>ohne Gerät</h3>
+<p class="lead">z. B. Kniebeuge zum Stuhl, gleich viele Wiederholungen</p>
+</div>
+</div>
+<div class="karte dunkelkarte rein" style="--i:3">
+<p class="kl">Ausdauer genauso</p>
+<p class="kt">Die eine Hälfte trainiert auf Ergometer, Laufband oder Crosstrainer, die andere geht zügig – dann wird gewechselt.</p>
+</div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 1</p></div>
+
+</section>
+<section data-einheit="1" id="e1-sicherheit">
+<div class="kopf">
+<p class="dach">Einheit 1 · Sicherheit</p>
+<h2 class="titel">Ihre Sicherheit geht vor</h2>
+</div>
+<div class="reihe r2">
+<div class="karte warnung">
+<svg class="symbol-klein" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 22 20.5H2z"/><path d="M12 10v5"/><path d="M12 17.6v.4"/></svg>
+<p class="kt">Sofort aufhören bei</p>
+<ul class="liste">
+<li>Schmerzen</li>
+<li>Schwindel oder Übelkeit</li>
+<li>Druck oder Enge in der Brust</li>
+<li>Atemnot, die nicht zur Anstrengung passt</li>
+<li>ungewöhnlichem Herzklopfen</li>
+</ul>
+<p class="lead">… und der Kursleitung Bescheid sagen.</p>
+</div>
+<div class="spalte">
+<div class="karte kompakt rein" style="--i:1"><p class="kt">Gesundheit verändert?</p><p class="lead">Vor der Einheit Bescheid sagen.</p></div>
+<div class="karte kompakt rein" style="--i:2"><p class="kt">Nie die Luft anhalten</p><p class="lead">Anstrengen ja, wehtun nein.</p></div>
+<div class="karte kompakt rein" style="--i:3"><p class="kt">Infekt oder Fieber?</p><p class="lead">Dann bitte zu Hause bleiben.</p></div>
+</div>
+</div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 1</p></div>
+
+</section>
+<section data-einheit="1" id="e1-borg">
+<div class="kopf">
+<p class="dach">Einheit 1 · Belastung steuern</p>
+<h2 class="titel">Ausdauer: etwas anstrengend ist richtig</h2>
+</div>
+<div class="skala-block">
+<div class="skala">
+<p class="skala-ziel" style="grid-column:6 / 9">Ihr Ziel: 11 bis 13</p>
+</div>
+<div class="skala">
+<div class="stufe"><p class="stufe-zahl">6</p></div>
+<div class="stufe"><p class="stufe-zahl">7</p></div>
+<div class="stufe"><p class="stufe-zahl">8</p></div>
+<div class="stufe"><p class="stufe-zahl">9</p></div>
+<div class="stufe"><p class="stufe-zahl">10</p></div>
+<div class="stufe ziel"><p class="stufe-zahl">11</p></div>
+<div class="stufe ziel"><p class="stufe-zahl">12</p></div>
+<div class="stufe ziel"><p class="stufe-zahl">13</p></div>
+<div class="stufe"><p class="stufe-zahl">14</p></div>
+<div class="stufe"><p class="stufe-zahl">15</p></div>
+<div class="stufe"><p class="stufe-zahl">16</p></div>
+<div class="stufe"><p class="stufe-zahl">17</p></div>
+<div class="stufe"><p class="stufe-zahl">18</p></div>
+<div class="stufe"><p class="stufe-zahl">19</p></div>
+<div class="stufe"><p class="stufe-zahl">20</p></div>
+</div>
+<div class="skala">
+<p class="skala-text" style="grid-column:1 / 5">6 = keine Anstrengung</p>
+<p class="skala-text" style="grid-column:6 / 9; text-align:center">leicht bis etwas anstrengend</p>
+<p class="skala-text" style="grid-column:12 / 16; text-align:right">20 = maximale Anstrengung</p>
+</div>
+</div>
+<div class="karte rein" style="--i:1">
+<p class="kl">Sprechtest</p>
+<p class="kt">In ganzen Sätzen sprechen können, aber nicht mehr singen. Nur noch einzelne Worte? Etwas langsamer werden.</p>
+</div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 1</p></div>
+
+</section>
+<section data-einheit="1" id="e1-aufgabe" class="aufgabe">
+<div class="kopf">
+<p class="dach">Einheit 1 · Wochenaufgabe</p>
+<h2 class="titel">Bis zur nächsten Woche</h2>
+</div>
+<div class="aufgaben">
+<div class="aufgabe-zeile rein" style="--i:1"><div class="kaestchen"></div><p class="aufgabe-text">Jeden Tag 10 Minuten mehr Bewegung im Alltag: Treppe statt Aufzug, ein Weg zu Fuß oder mit dem Fahrrad</p></div>
+<div class="aufgabe-zeile rein" style="--i:2"><div class="kaestchen"></div><p class="aufgabe-text">An zwei Tagen: Kniebeuge zum Stuhl, 2 × 10 Wiederholungen</p></div>
+<div class="aufgabe-zeile rein" style="--i:3"><div class="kaestchen"></div><p class="aufgabe-text">Eintrag ins Wochenprotokoll</p></div>
+</div>
+<p class="pille">Im Heft: Wochenprotokoll und Übungskarte 1</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 1</p></div>
+
+</section>
+<section data-einheit="2" id="e2-titel" class="einheit">
+<p class="riesenzahl">2</p>
+<div class="kopf">
+<p class="dach">Einheit 2 von 10</p>
+<h2 class="titel">Kraft für Beine und Rücken</h2>
+<p class="untertitel">Aufstehen und Heranziehen</p>
+</div>
+<div class="heute">
+<p class="heute-label">Heute</p>
+<ul class="liste">
+<li>Was Krafttraining bewirkt</li>
+<li>Neu: Beinpresse, Rudergerät und Laufband</li>
+<li>Das erste Krafttraining im Tandem</li>
+</ul>
+</div>
+<p class="pille">Rückblick: Wie lief Wochenaufgabe 1?</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 2</p></div>
+
+</section>
+<section data-einheit="2" id="e2-kraft" data-frage="1">
+<div class="kopf">
+<p class="dach">Einheit 2 · Frage an Sie</p>
+<h2 class="titel">Was bringt Krafttraining für die Gesundheit?</h2>
+</div>
+<div class="zweispaltig">
+<ul class="liste">
+<li>Ohne Training nimmt die Muskelkraft mit den Jahren ab.</li>
+<li>Krafttraining stärkt Muskeln, Sehnen und Knochen.</li>
+<li>Wer regelmäßig etwas für die Muskelkraft tut, hat ein geringeres Risiko für Herz-Kreislauf-Erkrankungen und Diabetes.</li>
+</ul>
+<div class="karte blaukarte rein" style="--i:1">
+<p class="zahl">30–60</p>
+<p class="kt">Minuten pro Woche wirken schon</p>
+<p class="lead">verteilt auf zwei kurze Einheiten</p>
+</div>
+</div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 2</p></div>
+
+<p class="frage-zeichen" aria-hidden="true">?</p>
+</section>
+<section data-einheit="2" id="e2-uebungsgenau" class="aussage">
+<p class="dach">Einheit 2 · Merksatz</p>
+<p class="satz">Man wird vor allem in der Bewegung stärker, die man trainiert.</p>
+<p class="folge">Deshalb üben Sie jede Gerätebewegung auch ohne Gerät. Dann kommt die Kraft beim Aufstehen, Tragen und Heben an.</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 2</p></div>
+
+</section>
+<section data-einheit="2" id="e2-geraete">
+<div class="kopf">
+<p class="dach">Einheit 2 · Gleich am Gerät</p>
+<h2 class="titel">Neu: Beinpresse und Rudergerät</h2>
+</div>
+<div class="reihe r2">
+<div class="karte rein" style="--i:1">
+<p class="kl">Grundbewegung Aufstehen</p>
+<h3>Beinpresse</h3>
+<div class="info"><p class="kl">Muskeln</p><p class="lead">Oberschenkelvorderseite, Gesäß</p></div>
+<div class="info"><p class="kl warnton">Achtung</p><p class="lead">Knie zeigen zu den Fußspitzen, Gesäß bleibt am Polster, Knie nicht durchdrücken</p></div>
+<div class="info"><p class="kl">Ohne Gerät</p><p class="lead">Kniebeuge zum Stuhl</p></div>
+</div>
+<div class="karte rein" style="--i:2">
+<p class="kl">Grundbewegung Heranziehen</p>
+<h3>Rudergerät</h3>
+<div class="info"><p class="kl">Muskeln</p><p class="lead">zwischen den Schulterblättern, hintere Schulter, Bizeps</p></div>
+<div class="info"><p class="kl warnton">Achtung</p><p class="lead">Rücken nicht rund, kein Schwung, Schultern nicht zu den Ohren ziehen</p></div>
+<div class="info"><p class="kl">Ohne Gerät</p><p class="lead">Einarmiges Rudern</p></div>
+</div>
+</div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 2</p></div>
+
+</section>
+<section data-einheit="2" id="e2-atmung" class="aussage">
+<p class="dach">Einheit 2 · Sicherheit</p>
+<p class="satz">Bei der Anstrengung ausatmen. Nie die Luft anhalten.</p>
+<p class="folge">Pressatmung treibt den Blutdruck stark in die Höhe. Lieber ein Gewicht weniger und dafür gleichmäßig atmen.</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 2</p></div>
+
+</section>
+<section data-einheit="2" id="e2-aufgabe" class="aufgabe">
+<div class="kopf">
+<p class="dach">Einheit 2 · Wochenaufgabe</p>
+<h2 class="titel">Bis zur nächsten Woche</h2>
+</div>
+<div class="aufgaben">
+<div class="aufgabe-zeile rein" style="--i:1"><div class="kaestchen"></div><p class="aufgabe-text">An zwei Tagen: Kniebeuge zum Stuhl und einarmiges Rudern (Wasserflasche oder Einkaufstasche), je 2 × 12</p></div>
+<div class="aufgabe-zeile rein" style="--i:2"><div class="kaestchen"></div><p class="aufgabe-text">Jeden Tag Treppe statt Aufzug</p></div>
+<div class="aufgabe-zeile rein" style="--i:3"><div class="kaestchen"></div><p class="aufgabe-text">Eintrag ins Wochenprotokoll</p></div>
+</div>
+<p class="pille">Im Heft: Übungskarten 1 und 2, Trainingskarte</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 2</p></div>
+
+</section>
+<section data-einheit="3" id="e3-titel" class="einheit">
+<p class="riesenzahl">3</p>
+<div class="kopf">
+<p class="dach">Einheit 3 von 10</p>
+<h2 class="titel">Drücken und Ziehen</h2>
+<p class="untertitel">Der Oberkörper</p>
+</div>
+<div class="heute">
+<p class="heute-label">Heute</p>
+<ul class="liste">
+<li>Belastung richtig dosieren</li>
+<li>Neu: Brustpresse, Latzug und Crosstrainer</li>
+<li>Brauche ich Eiweißpulver oder Präparate?</li>
+</ul>
+</div>
+<p class="pille">Rückblick: Wie passten die Gewichte? Wie lief Wochenaufgabe 2?</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 3</p></div>
+
+</section>
+<section data-einheit="3" id="e3-dosis">
+<div class="kopf">
+<p class="dach">Einheit 3 · Wissen</p>
+<h2 class="titel">Die richtige Dosis im Krafttraining</h2>
+<p class="lead">Wählen Sie das Gewicht so, dass Sie am Ende des Satzes noch zwei bis drei Wiederholungen schaffen würden.</p>
+</div>
+<div class="skala-block">
+<div class="wdh-label"><p class="kt" style="width:1248px">Ihr Satz: 12 bis 15 Wiederholungen</p><p class="kt nowrap" style="width:240px">Reserve: 2–3</p></div>
+<div class="wdh">
+<div class="wdh-box"></div><div class="wdh-box"></div><div class="wdh-box"></div><div class="wdh-box"></div><div class="wdh-box"></div>
+<div class="wdh-box"></div><div class="wdh-box"></div><div class="wdh-box"></div><div class="wdh-box"></div><div class="wdh-box"></div>
+<div class="wdh-box"></div><div class="wdh-box"></div><div class="wdh-box"></div><div class="wdh-box"></div><div class="wdh-box"></div>
+<div class="wdh-box reserve"></div><div class="wdh-box reserve"></div><div class="wdh-box reserve"></div>
+</div>
+</div>
+<div class="reihe r3">
+<div class="karte kompakt rein" style="--i:1"><p class="kt">Tempo</p><p class="lead">2 Sekunden heben, 2 Sekunden senken, kein Schwung</p></div>
+<div class="karte kompakt rein" style="--i:2"><p class="kt">Steigern</p><p class="lead">Erst bei 15 sauberen Wiederholungen eine Stufe mehr</p></div>
+<div class="karte kompakt rein" style="--i:3"><p class="kt">Atmen</p><p class="lead">Bei der Anstrengung aus, nie die Luft anhalten</p></div>
+</div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 3</p></div>
+
+</section>
+<section data-einheit="3" id="e3-warnsignal" data-frage="1">
+<div class="kopf">
+<p class="dach">Einheit 3 · Frage an Sie</p>
+<h2 class="titel">Muskelkater und Gelenkschmerzen – was ist normal?</h2>
+</div>
+<div class="reihe r2">
+<div class="karte rein" style="--i:1">
+<p class="kl">Normal</p>
+<h3>Muskelkater</h3>
+<p class="lead">in den ersten Wochen. Er vergeht nach ein bis drei Tagen.</p>
+</div>
+<div class="karte warnung rein" style="--i:2">
+<p class="kl warnton">Aufhören</p>
+<h3>Gelenkschmerzen</h3>
+<p class="lead">sind ein Zeichen zum Aufhören. Sagen Sie der Kursleitung Bescheid.</p>
+</div>
+</div>
+<div class="merksatz"><p class="ms">Training soll anstrengen, aber nicht wehtun.</p></div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 3</p></div>
+
+<p class="frage-zeichen" aria-hidden="true">?</p>
+</section>
+<section data-einheit="3" id="e3-geraete">
+<div class="kopf">
+<p class="dach">Einheit 3 · Gleich am Gerät</p>
+<h2 class="titel">Neu: Brustpresse und Latzug</h2>
+</div>
+<div class="reihe r2">
+<div class="karte rein" style="--i:1">
+<p class="kl">Grundbewegung Wegdrücken</p>
+<h3>Brustpresse</h3>
+<div class="info"><p class="kl">Muskeln</p><p class="lead">Brust, vordere Schulter, Trizeps</p></div>
+<div class="info"><p class="kl warnton">Achtung</p><p class="lead">Schultern bleiben unten und hinten, Ellbogen etwas unter Schulterhöhe, kein Hohlkreuz</p></div>
+<div class="info"><p class="kl">Ohne Gerät</p><p class="lead">Liegestütz an der Wand</p></div>
+</div>
+<div class="karte rein" style="--i:2">
+<p class="kl">Grundbewegung Herunterziehen</p>
+<h3>Latzug</h3>
+<div class="info"><p class="kl">Muskeln</p><p class="lead">breiter Rückenmuskel, großer Rundmuskel, Bizeps</p></div>
+<div class="info"><p class="kl warnton">Achtung</p><p class="lead">Nie hinter den Nacken ziehen, nicht mit Schwung zurücklehnen, kein Hohlkreuz</p></div>
+<div class="info"><p class="kl">Ohne Gerät</p><p class="lead">Handtuchzug über Kopf</p></div>
+</div>
+</div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 3</p></div>
+
+</section>
+<section data-einheit="3" id="e3-praeparate">
+<div class="kopf">
+<p class="dach">Einheit 3 · Wissen</p>
+<h2 class="titel">Brauche ich Eiweißpulver oder Präparate?</h2>
+</div>
+<div class="reihe r2">
+<div class="karte kompakt rein" style="--i:1"><p class="kt">Ausgewogene Ernährung reicht</p><p class="lead">Eiweißpulver und Präparate braucht es für dieses Training nicht.</p></div>
+<div class="karte kompakt rein" style="--i:2"><p class="kt">Nicht immer drin, was draufsteht</p><p class="lead">Präparate können Stoffe enthalten, die nicht auf der Packung stehen.</p></div>
+<div class="karte kompakt rein" style="--i:3"><p class="kt">Keine Schmerzmittel vor dem Training</p><p class="lead">Sie überdecken die Warnsignale Ihres Körpers.</p></div>
+<div class="karte kompakt rein" style="--i:4"><p class="kt">Keine Mittel zum Muskelaufbau</p><p class="lead">Anabolika und aufputschende Mittel gefährden die Gesundheit.</p></div>
+</div>
+<div class="merksatz"><p class="lead">Fragen zu Ernährung oder Medikamenten? Sprechen Sie mit Ihrer Ärztin oder Ihrem Arzt.</p></div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 3</p></div>
+
+</section>
+<section data-einheit="3" id="e3-aufgabe" class="aufgabe">
+<div class="kopf">
+<p class="dach">Einheit 3 · Wochenaufgabe</p>
+<h2 class="titel">Bis zur nächsten Woche</h2>
+</div>
+<div class="aufgaben">
+<div class="aufgabe-zeile rein" style="--i:1"><div class="kaestchen"></div><p class="aufgabe-text">An zwei Tagen: die vier Übungen ohne Gerät (Übungskarten 1 bis 4), je 2 × 12</p></div>
+<div class="aufgabe-zeile rein" style="--i:2"><div class="kaestchen"></div><p class="aufgabe-text">Jeden Tag ein Weg zu Fuß oder mit dem Fahrrad</p></div>
+<div class="aufgabe-zeile rein" style="--i:3"><div class="kaestchen"></div><p class="aufgabe-text">Eintrag ins Wochenprotokoll</p></div>
+</div>
+<p class="pille">Im Heft: Übungskarten 3 und 4, Infokasten Nahrungsergänzung</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 3</p></div>
+
+</section>
+<section data-einheit="4" id="e4-titel" class="einheit">
+<p class="riesenzahl">4</p>
+<div class="kopf">
+<p class="dach">Einheit 4 von 10</p>
+<h2 class="titel">Die Mitte stärken</h2>
+<p class="untertitel">Aufrichten und Einrollen</p>
+</div>
+<div class="heute">
+<p class="heute-label">Heute</p>
+<ul class="liste">
+<li>Die Rumpfmuskulatur: Ihr Muskelkorsett</li>
+<li>Neu: Rückenstrecker und Bauchtrainer, der ganze Zirkel</li>
+<li>Ihr Heimprogramm beginnt</li>
+</ul>
+</div>
+<p class="pille">Rückblick: Wie lief Wochenaufgabe 3?</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 4</p></div>
+
+</section>
+<section data-einheit="4" id="e4-korsett" data-frage="1">
+<div class="kopf">
+<p class="dach">Einheit 4 · Frage an Sie</p>
+<h2 class="titel">Welche Muskeln halten Ihre Wirbelsäule stabil?</h2>
+</div>
+<div class="zweispaltig">
+<ul class="liste">
+<li>Bauch- und Rückenmuskeln umschließen den Rumpf wie ein Korsett.</li>
+<li>Sie arbeiten zusammen und stabilisieren die Wirbelsäule beim Heben, Tragen und Drehen.</li>
+<li>Deshalb trainieren wir Vorder- und Rückseite gleichermaßen.</li>
+</ul>
+<div class="zeichnung" style="width:640px; height:520px">
+<svg aria-label="Querschnitt des Rumpfs von oben: vorn ein Ring aus Bauchmuskeln, hinten Rückenmuskeln, dazwischen die Wirbelsäule" width="640" height="520" viewBox="0 0 640 520" xmlns="http://www.w3.org/2000/svg">
+<ellipse cx="320" cy="260" rx="220" ry="170" fill="#E9EEF8"/>
+<path d="M100 260 A220 170 0 0 1 540 260" fill="none" stroke="#3D4BA7" stroke-width="56"/>
+<path d="M540 260 A220 170 0 0 1 100 260" fill="none" stroke="#5894D5" stroke-width="56"/>
+<circle cx="320" cy="390" r="34" fill="#151831"/>
+</svg>
+<p class="kt" style="position:absolute; left:0; top:0; width:640px; text-align:center">Bauchmuskeln (vorn)</p>
+<p class="lead" style="position:absolute; left:170px; top:300px; width:300px; text-align:center">Wirbelsäule</p>
+<p class="kt" style="position:absolute; left:0; top:470px; width:640px; text-align:center">Rückenmuskeln (hinten)</p>
+</div>
+</div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 4</p></div>
+
+<p class="frage-zeichen" aria-hidden="true">?</p>
+</section>
+<section data-einheit="4" id="e4-haltung" class="aussage">
+<p class="dach">Einheit 4 · Merksatz</p>
+<p class="satz">Eine gute Haltung ist keine starre Haltung.</p>
+<p class="folge">Wechseln Sie Ihre Haltung oft – beim Sitzen, beim Stehen und bei der Arbeit.</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 4</p></div>
+
+</section>
+<section data-einheit="4" id="e4-geraete">
+<div class="kopf">
+<p class="dach">Einheit 4 · Gleich am Gerät</p>
+<h2 class="titel">Neu: Rückenstrecker und Bauchtrainer</h2>
+</div>
+<div class="reihe r2">
+<div class="karte rein" style="--i:1">
+<p class="kl">Grundbewegung Aufrichten</p>
+<h3>Rückenstrecker</h3>
+<div class="info"><p class="kl">Muskeln</p><p class="lead">Rückenstrecker, Gesäß</p></div>
+<div class="info"><p class="kl warnton">Achtung</p><p class="lead">Nur bis zur aufrechten Position, nicht ins Hohlkreuz drücken, kein Ruck</p></div>
+<div class="info"><p class="kl">Ohne Gerät</p><p class="lead">Diagonales Strecken im Vierfüßlerstand</p></div>
+</div>
+<div class="karte rein" style="--i:2">
+<p class="kl">Grundbewegung Einrollen</p>
+<h3>Bauchtrainer</h3>
+<div class="info"><p class="kl">Muskeln</p><p class="lead">gerader und schräge Bauchmuskeln</p></div>
+<div class="info"><p class="kl warnton">Achtung</p><p class="lead">Nicht mit den Armen ziehen, Nacken lang lassen, kein Schwung</p></div>
+<div class="info"><p class="kl">Ohne Gerät</p><p class="lead">Crunch</p></div>
+</div>
+</div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 4</p></div>
+
+</section>
+<section data-einheit="4" id="e4-heimprogramm">
+<div class="kopf">
+<p class="dach">Einheit 4 · Ab heute</p>
+<h2 class="titel">Ihr Heimprogramm beginnt</h2>
+<p class="lead">Die sechs Übungen ohne Gerät ergeben zusammen ein Ganzkörpertraining in 15 bis 20 Minuten.</p>
+</div>
+<div class="reihe r3">
+<div class="kachel rein" style="--i:1"><p class="nr">1</p><p class="nr-text">Kniebeuge zum Stuhl</p></div>
+<div class="kachel rein" style="--i:2"><p class="nr">2</p><p class="nr-text">Einarmiges Rudern</p></div>
+<div class="kachel rein" style="--i:3"><p class="nr">3</p><p class="nr-text">Liegestütz an der Wand</p></div>
+<div class="kachel rein" style="--i:4"><p class="nr">4</p><p class="nr-text">Handtuchzug über Kopf</p></div>
+<div class="kachel rein" style="--i:5"><p class="nr">5</p><p class="nr-text">Diagonales Strecken im Vierfüßlerstand</p></div>
+<div class="kachel rein" style="--i:6"><p class="nr">6</p><p class="nr-text">Crunch</p></div>
+</div>
+<div class="merksatz"><p class="lead">Sie brauchen nur Stuhl, Wand, Handtuch, Wasserflasche und eine Matte oder einen Teppich. Den ganzen Ablauf mit Aufwärmen und Dehnen finden Sie im Heft unter „Mein Heimprogramm“.</p></div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 4</p></div>
+
+</section>
+<section data-einheit="4" id="e4-aufgabe" class="aufgabe">
+<div class="kopf">
+<p class="dach">Einheit 4 · Wochenaufgabe</p>
+<h2 class="titel">Bis zur nächsten Woche</h2>
+</div>
+<div class="aufgaben">
+<div class="aufgabe-zeile rein" style="--i:1"><div class="kaestchen"></div><p class="aufgabe-text">Einmal das Heimprogramm: sechs Übungen, je 2 Sätze</p></div>
+<div class="aufgabe-zeile rein" style="--i:2"><div class="kaestchen"></div><p class="aufgabe-text">An einem weiteren Tag 20 Minuten zügig gehen</p></div>
+<div class="aufgabe-zeile rein" style="--i:3"><div class="kaestchen"></div><p class="aufgabe-text">Eintrag ins Wochenprotokoll</p></div>
+</div>
+<p class="pille">Im Heft: Übungskarten 5 und 6, Mein Heimprogramm</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 4</p></div>
+
+</section>
+<section data-einheit="5" id="e5-titel" class="einheit">
+<p class="riesenzahl">5</p>
+<div class="kopf">
+<p class="dach">Einheit 5 von 10</p>
+<h2 class="titel">Ausdauer verstehen und steuern</h2>
+<p class="untertitel">Herz, Kreislauf und Alltagswege</p>
+</div>
+<div class="heute">
+<p class="heute-label">Heute</p>
+<ul class="liste">
+<li>Was Ausdauertraining bewirkt</li>
+<li>Die Belastung selbst steuern</li>
+<li>Ausdauer im Alltag</li>
+</ul>
+</div>
+<p class="pille">Rückblick: Wie lief Ihr erstes Heimprogramm?</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 5</p></div>
+
+</section>
+<section data-einheit="5" id="e5-herz">
+<div class="kopf">
+<p class="dach">Einheit 5 · Wissen</p>
+<h2 class="titel">Das Herz ist ein Muskel und passt sich an</h2>
+</div>
+<div class="reihe r3">
+<div class="karte rein" style="--i:1">
+<svg class="symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h4l3-8 6 16 3-8h4"/></svg>
+<p class="kt">Leistungsfähigkeit</p>
+<p class="lead">Herz, Kreislauf und Atmung werden leistungsfähiger.</p>
+</div>
+<div class="karte rein" style="--i:2">
+<svg class="symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3.5v16.5h16.5"/><path d="M7.5 15l4-4 3 2.5 5-6"/></svg>
+<p class="kt">Blutwerte</p>
+<p class="lead">Blutdruck, Blutzucker und Blutfette können sich günstig verändern.</p>
+</div>
+<div class="karte rein" style="--i:3">
+<svg class="symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.8-3.4 8.1-8 9-4.6-.9-8-4.2-8-9V6z"/><path d="M8.5 12.2l2.4 2.4 4.6-5"/></svg>
+<p class="kt">Geringeres Risiko</p>
+<p class="lead">Bessere Ausdauer geht mit einem deutlich geringeren Risiko für Herz-Kreislauf-Erkrankungen einher.</p>
+</div>
+</div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 5</p></div>
+
+</section>
+<section data-einheit="5" id="e5-steuern">
+<div class="kopf">
+<p class="dach">Einheit 5 · Belastung steuern</p>
+<h2 class="titel">Ausdauer selbst steuern</h2>
+</div>
+<div class="reihe r3">
+<div class="karte rein" style="--i:1">
+<p class="zahl">11–13</p>
+<p class="kt">auf der Borg-Skala</p>
+<p class="lead">leicht bis etwas anstrengend</p>
+</div>
+<div class="karte rein" style="--i:2">
+<svg class="symbol-gross" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9.5L4 20z"/></svg>
+<p class="kt">Sprechtest</p>
+<p class="lead">Ganze Sätze gehen, singen nicht mehr</p>
+</div>
+<div class="karte rein" style="--i:3">
+<svg class="symbol-gross" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+<p class="kt">Puls zur Orientierung</p>
+<p class="lead">15 Sekunden am Handgelenk zählen, mal 4</p>
+</div>
+</div>
+<div class="merksatz"><p class="ms">Erst die Dauer steigern, dann das Tempo.</p></div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 5</p></div>
+
+</section>
+<section data-einheit="5" id="e5-wochendosis" data-frage="1">
+<div class="kopf">
+<p class="dach">Einheit 5 · Frage an Sie</p>
+<h2 class="titel">Wie verteilen Sie 150 Minuten auf die Woche?</h2>
+</div>
+<div class="woche">
+<div></div><p class="tag">Mo</p><p class="tag">Di</p><p class="tag">Mi</p><p class="tag">Do</p><p class="tag">Fr</p><p class="tag">Sa</p><p class="tag">So</p>
+<p class="woche-label">5 × 30 Minuten</p>
+<div class="feld-an"><p class="minuten">30</p></div><div class="feld-an"><p class="minuten">30</p></div><div class="feld-an"><p class="minuten">30</p></div><div class="feld-an"><p class="minuten">30</p></div><div class="feld-an"><p class="minuten">30</p></div><div class="feld-aus"></div><div class="feld-aus"></div>
+<p class="woche-label">3 × 50 Minuten</p>
+<div class="feld-an"><p class="minuten">50</p></div><div class="feld-aus"></div><div class="feld-an"><p class="minuten">50</p></div><div class="feld-aus"></div><div class="feld-aus"></div><div class="feld-an"><p class="minuten">50</p></div><div class="feld-aus"></div>
+<p class="woche-label">7 × 22 Minuten</p>
+<div class="feld-an"><p class="minuten">22</p></div><div class="feld-an"><p class="minuten">22</p></div><div class="feld-an"><p class="minuten">22</p></div><div class="feld-an"><p class="minuten">22</p></div><div class="feld-an"><p class="minuten">22</p></div><div class="feld-an"><p class="minuten">22</p></div><div class="feld-an"><p class="minuten">22</p></div>
+</div>
+<div class="merksatz"><p class="lead">Auch kurze Abschnitte von wenigen Minuten zählen. Wege zu Fuß und mit dem Rad gehören dazu.</p></div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 5</p></div>
+
+<p class="frage-zeichen" aria-hidden="true">?</p>
+</section>
+<section data-einheit="5" id="e5-alltag">
+<div class="kopf">
+<p class="dach">Einheit 5 · Ausdauer im Alltag</p>
+<h2 class="titel">Jeder Weg zählt</h2>
+</div>
+<div class="zweispaltig">
+<div class="spalte">
+<ul class="liste">
+<li>Kurze Strecken zu Fuß oder mit dem Fahrrad statt mit dem Auto</li>
+<li>Beim Pendeln eine Haltestelle früher aussteigen</li>
+<li>Treppe statt Aufzug</li>
+</ul>
+<div class="merksatz"><p class="ms">Gehen wirkt wie Ergometer und Laufband – und geht überall.</p></div>
+</div>
+<div class="karte dunkelkarte rein" style="--i:1">
+<p class="kl">Gesprächsrunde</p>
+<p class="kt">Welche Ihrer Wege könnten Sie zu Fuß oder mit dem Rad machen?</p>
+<p class="lead">Das tut Ihrer Gesundheit gut und schont das Klima.</p>
+</div>
+</div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 5</p></div>
+
+</section>
+<section data-einheit="5" id="e5-aufgabe" class="aufgabe">
+<div class="kopf">
+<p class="dach">Einheit 5 · Wochenaufgabe</p>
+<h2 class="titel">Bis zur nächsten Woche</h2>
+</div>
+<div class="aufgaben">
+<div class="aufgabe-zeile rein" style="--i:1"><div class="kaestchen"></div><p class="aufgabe-text">30 Minuten mehr Ausdauer als bisher, z. B. 3 × 10 Minuten gehen oder Wege mit dem Fahrrad</p></div>
+<div class="aufgabe-zeile rein" style="--i:2"><div class="kaestchen"></div><p class="aufgabe-text">Einmal das Heimprogramm</p></div>
+<div class="aufgabe-zeile rein" style="--i:3"><div class="kaestchen"></div><p class="aufgabe-text">Eintrag ins Wochenprotokoll</p></div>
+</div>
+<p class="pille">Im Heft: Wochendosis-Rechner ausfüllen</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 5</p></div>
+
+</section>
+<section data-einheit="6" id="e6-titel" class="einheit">
+<p class="riesenzahl">6</p>
+<div class="kopf">
+<p class="dach">Einheit 6 von 10</p>
+<h2 class="titel">Beweglich und sicher</h2>
+<p class="untertitel">Dehnfähigkeit und Koordination</p>
+</div>
+<div class="heute">
+<p class="heute-label">Heute</p>
+<ul class="liste">
+<li>Warum Beweglichkeit zählt und wie Dehnen geht</li>
+<li>Gleichgewicht trainieren</li>
+<li>Zwischenkontrolle: Ihre Werte seit Einheit 1</li>
+</ul>
+</div>
+<p class="pille">Rückblick: Wer hat die Wochendosis gesteigert?</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 6</p></div>
+
+</section>
+<section data-einheit="6" id="e6-beweglichkeit" data-frage="1">
+<div class="kopf">
+<p class="dach">Einheit 6 · Frage an Sie</p>
+<h2 class="titel">Wofür brauchen Sie im Alltag Beweglichkeit?</h2>
+</div>
+<div class="reihe r3">
+<div class="karte kompakt rein" style="--i:1"><h3>Schuhe binden</h3></div>
+<div class="karte kompakt rein" style="--i:2"><h3>Schulterblick im Auto</h3></div>
+<div class="karte kompakt rein" style="--i:3"><h3>Griff ins obere Regal</h3></div>
+</div>
+<p class="lead">Beweglichkeit nimmt ab, wenn man sie nicht nutzt – und kommt mit Dehnen wieder.</p>
+<div class="skala-block">
+<p class="kl">So dehnen Sie richtig</p>
+<div class="reihe r4">
+<div class="kachel"><p class="kt">20 bis 30 Sekunden halten</p></div>
+<div class="kachel"><p class="kt">zweimal je Dehnung</p></div>
+<div class="kachel"><p class="kt">deutliches Ziehen, kein Schmerz</p></div>
+<div class="kachel"><p class="kt">ruhig atmen, nicht wippen</p></div>
+</div>
+</div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 6</p></div>
+
+<p class="frage-zeichen" aria-hidden="true">?</p>
+</section>
+<section data-einheit="6" id="e6-gleichgewicht">
+<div class="kopf">
+<p class="dach">Einheit 6 · Wissen</p>
+<h2 class="titel">Gleichgewicht ist trainierbar</h2>
+</div>
+<div class="gg">
+<div class="spalte" style="gap:12px">
+<div class="kachel rein" style="--i:1"><p class="kt">Augen</p></div>
+<div class="kachel rein" style="--i:2"><p class="kt">Gleichgewichtsorgan im Innenohr</p></div>
+<div class="kachel rein" style="--i:3"><p class="kt">Muskel- und Gelenksinn</p></div>
+<div class="kachel rein" style="--i:4"><p class="kt">Muskulatur</p></div>
+</div>
+<x-shape kind="arrow-right" class="pfeil"></x-shape>
+<div class="karte blaukarte rein" style="--i:5">
+<h3>Gleichgewicht</h3>
+<p class="lead">entsteht aus diesem Zusammenspiel. Es ist in jedem Alter trainierbar und macht Ihre Bewegungen sicherer.</p>
+</div>
+</div>
+<div class="merksatz"><p class="lead">Immer so üben, dass Sie sich festhalten können: Wand, Stuhllehne, Arbeitsplatte.</p></div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 6</p></div>
+
+</section>
+<section data-einheit="6" id="e6-selbsttest" class="aussage">
+<p class="dach">Einheit 6 · Selbsttest</p>
+<p class="satz">Können Sie die Hände hinter dem Rücken zusammenführen?</p>
+<p class="folge">Eine Hand von oben über die Schulter, eine von unten. Heute ist außerdem Zwischenkontrolle: Aufstehtest und Einbeinstand wie in Einheit 1. Tragen Sie Ihre Werte im Heft unter „Meine Werte“ ein.</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 6</p></div>
+
+</section>
+<section data-einheit="6" id="e6-aufgabe" class="aufgabe">
+<div class="kopf">
+<p class="dach">Einheit 6 · Wochenaufgabe</p>
+<h2 class="titel">Bis zur nächsten Woche</h2>
+</div>
+<div class="aufgaben">
+<div class="aufgabe-zeile rein" style="--i:1"><div class="kaestchen"></div><p class="aufgabe-text">Zweimal das Dehnprogramm</p></div>
+<div class="aufgabe-zeile rein" style="--i:2"><div class="kaestchen"></div><p class="aufgabe-text">Jeden Tag beim Zähneputzen auf einem Bein stehen – Seiten wechseln, Festhalten möglich</p></div>
+<div class="aufgabe-zeile rein" style="--i:3"><div class="kaestchen"></div><p class="aufgabe-text">Einmal das Heimprogramm und Eintrag ins Wochenprotokoll</p></div>
+</div>
+<p class="pille">Im Heft: Dehnprogramm und Gleichgewicht</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 6</p></div>
+
+</section>
+<section data-einheit="7" id="e7-titel" class="einheit">
+<p class="riesenzahl">7</p>
+<div class="kopf">
+<p class="dach">Einheit 7 von 10</p>
+<h2 class="titel">Anspannung und Entspannung</h2>
+<p class="untertitel">Das Entspannungsmodul</p>
+</div>
+<div class="heute">
+<p class="heute-label">Heute</p>
+<ul class="liste">
+<li>Belastung, Anspannung und Erholung</li>
+<li>Zwei Wege, mit Belastung umzugehen</li>
+<li>Progressive Muskelrelaxation zum Mitmachen</li>
+</ul>
+</div>
+<p class="pille">Rückblick: Wie lief das Dehnprogramm?</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 7</p></div>
+
+</section>
+<section data-einheit="7" id="e7-anspannung">
+<div class="kopf">
+<p class="dach">Einheit 7 · Wissen</p>
+<h2 class="titel">Anspannung ist normal</h2>
+</div>
+<div class="kette">
+<div class="karte kompakt rein" style="--i:1"><h3>Belastung</h3><p class="lead">Etwas wird von uns gefordert</p></div>
+<x-shape kind="arrow-right" class="pfeil-klein"></x-shape>
+<div class="karte kompakt rein" style="--i:2"><h3>Anspannung</h3><p class="lead">eine natürliche Reaktion darauf</p></div>
+<x-shape kind="arrow-right" class="pfeil-klein"></x-shape>
+<div class="karte kompakt blaukarte rein" style="--i:3"><h3>Erholung</h3><p class="lead">Pausen, Schlaf, Entspannung</p></div>
+</div>
+<div class="karte kompakt">
+<p class="kt">Fehlt die Erholung …</p>
+<p class="lead">bleiben die Muskeln verspannt, der Schlaf wird schlechter, die Stimmung sinkt.</p>
+</div>
+<div class="merksatz"><p class="ms">Bewegung hilft, Anspannung abzubauen – und hebt nachweislich die Stimmung.</p></div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 7</p></div>
+
+</section>
+<section data-einheit="7" id="e7-zwei-wege" data-frage="1">
+<div class="kopf">
+<p class="dach">Einheit 7 · Frage an Sie</p>
+<h2 class="titel">Was hilft Ihnen, wenn es stressig wird?</h2>
+</div>
+<div class="reihe r2">
+<div class="karte rein" style="--i:1">
+<p class="kl">Problemzentriert</p>
+<h3>An der Ursache arbeiten</h3>
+<ul class="liste">
+<li>Pausen einplanen</li>
+<li>Belastung dosieren</li>
+<li>Bewegung als Ausgleich nutzen</li>
+</ul>
+</div>
+<div class="karte rein" style="--i:2">
+<p class="kl">Emotionszentriert</p>
+<h3>Mit der Anspannung umgehen</h3>
+<ul class="liste">
+<li>Entspannung</li>
+<li>ruhiges Atmen</li>
+<li>mit anderen sprechen</li>
+</ul>
+</div>
+</div>
+<div class="merksatz"><p class="ms">Beides ergänzt sich. Was machen Sie schon?</p></div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 7</p></div>
+
+<p class="frage-zeichen" aria-hidden="true">?</p>
+</section>
+<section data-einheit="7" id="e7-pmr">
+<div class="kopf">
+<p class="dach">Einheit 7 · Entspannungsmodul</p>
+<h2 class="titel">Progressive Muskelrelaxation nach Jacobson</h2>
+</div>
+<div class="zweispaltig" style="align-items:start">
+<div class="spalte">
+<div class="kachel rein" style="--i:1"><p class="zahl nowrap" style="flex-shrink:0; width:350px">5–7</p><p class="kt">Sekunden anspannen, mit etwa halber Kraft</p></div>
+<div class="kachel rein" style="--i:2"><p class="zahl nowrap" style="flex-shrink:0; width:350px">30–45</p><p class="kt">Sekunden loslassen und nachspüren</p></div>
+</div>
+<div class="spalte" style="gap:8px">
+<p class="kl">Sieben Muskelgruppen nacheinander</p>
+<ol class="liste">
+<li>Hände und Arme</li>
+<li>Gesicht</li>
+<li>Nacken und Schultern</li>
+<li>Rücken</li>
+<li>Bauch</li>
+<li>Gesäß und Oberschenkel</li>
+<li>Unterschenkel und Füße</li>
+</ol>
+</div>
+</div>
+<div class="merksatz"><p class="lead">Entspannung ersetzt keine ärztliche Abklärung bei anhaltenden Beschwerden.</p></div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 7</p></div>
+
+</section>
+<section data-einheit="7" id="e7-aufgabe" class="aufgabe">
+<div class="kopf">
+<p class="dach">Einheit 7 · Wochenaufgabe</p>
+<h2 class="titel">Bis zur nächsten Woche</h2>
+</div>
+<div class="aufgaben">
+<div class="aufgabe-zeile rein" style="--i:1"><div class="kaestchen"></div><p class="aufgabe-text">Zweimal die Progressive Muskelrelaxation, Kurzform nach der Anleitung im Heft</p></div>
+<div class="aufgabe-zeile rein" style="--i:2"><div class="kaestchen"></div><p class="aufgabe-text">Einmal das Heimprogramm</p></div>
+<div class="aufgabe-zeile rein" style="--i:3"><div class="kaestchen"></div><p class="aufgabe-text">Eintrag ins Wochenprotokoll</p></div>
+</div>
+<p class="pille">Im Heft: Progressive Muskelrelaxation, Meine zwei Wege</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 7</p></div>
+
+</section>
+<section data-einheit="8" id="e8-titel" class="einheit">
+<p class="riesenzahl">8</p>
+<div class="kopf">
+<p class="dach">Einheit 8 von 10</p>
+<h2 class="titel">Bewegung im Alltag</h2>
+<p class="untertitel">Sitzen, Arbeiten, Wege</p>
+</div>
+<div class="heute">
+<p class="heute-label">Heute</p>
+<ul class="liste">
+<li>Langes Sitzen unterbrechen</li>
+<li>Der gesunde Arbeitsplatz</li>
+<li>Bewegung zur einfachen Wahl machen</li>
+</ul>
+</div>
+<p class="pille">Rückblick: Wie ging die Entspannung zu Hause?</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 8</p></div>
+
+</section>
+<section data-einheit="8" id="e8-sitzen" data-frage="1">
+<div class="kopf">
+<p class="dach">Einheit 8 · Frage an Sie</p>
+<h2 class="titel">Wie oft sollte man langes Sitzen unterbrechen?</h2>
+</div>
+<div class="zweispaltig">
+<ul class="liste">
+<li>Viele Erwachsene sitzen den größten Teil des Tages.</li>
+<li>Langes, ununterbrochenes Sitzen ist mit gesundheitlichen Risiken verbunden – auch bei Menschen, die sonst Sport treiben.</li>
+</ul>
+<div class="karte blaukarte rein" style="--i:1">
+<p class="kl">Alle</p>
+<p class="zahl">30–60</p>
+<p class="kt">Minuten kurz aufstehen</p>
+<p class="lead">für ein bis zwei Minuten</p>
+</div>
+</div>
+<p class="pille">Wie viele Stunden sitzen Sie an einem normalen Tag?</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 8</p></div>
+
+<p class="frage-zeichen" aria-hidden="true">?</p>
+</section>
+<section data-einheit="8" id="e8-arbeitsplatz">
+<div class="kopf">
+<p class="dach">Einheit 8 · Wissen</p>
+<h2 class="titel">Der gesunde Arbeitsplatz</h2>
+</div>
+<div class="zweispaltig">
+<div class="spalte">
+<div class="nr-zeile"><p class="nr">1</p><p class="nr-text">Füße flach auf dem Boden, Oberschenkel etwa waagerecht</p></div>
+<div class="nr-zeile"><p class="nr">2</p><p class="nr-text">Tisch auf Ellbogenhöhe</p></div>
+<div class="nr-zeile"><p class="nr">3</p><p class="nr-text">Bildschirm eine Armlänge entfernt</p></div>
+<div class="nr-zeile"><p class="nr">4</p><p class="nr-text">Oberkante auf oder knapp unter Augenhöhe</p></div>
+<div class="nr-zeile"><p class="nr">5</p><p class="nr-text">Licht von der Seite, zwischen Sitzen und Stehen wechseln</p></div>
+</div>
+<div class="zeichnung" style="width:760px; height:560px">
+<svg aria-label="Seitenansicht eines Arbeitsplatzes: Person sitzt aufrecht, Füße flach auf dem Boden, Oberschenkel waagerecht, Unterarme auf Tischhöhe, Bildschirm eine Armlänge entfernt mit der Oberkante auf Augenhöhe" width="760" height="560" viewBox="0 0 760 560" xmlns="http://www.w3.org/2000/svg">
+<line x1="20" y1="540" x2="740" y2="540" stroke="#C5CCE0" stroke-width="4"/>
+<rect x="176" y="220" width="18" height="160" rx="8" fill="#9AA3C7"/>
+<rect x="170" y="372" width="170" height="20" rx="8" fill="#9AA3C7"/>
+<rect x="247" y="392" width="16" height="110" fill="#9AA3C7"/>
+<rect x="180" y="500" width="150" height="14" rx="7" fill="#9AA3C7"/>
+<circle cx="192" cy="526" r="10" fill="#9AA3C7"/>
+<circle cx="318" cy="526" r="10" fill="#9AA3C7"/>
+<rect x="360" y="330" width="380" height="18" rx="6" fill="#9AA3C7"/>
+<rect x="700" y="348" width="18" height="192" fill="#9AA3C7"/>
+<rect x="520" y="170" width="16" height="120" rx="4" fill="#151831"/>
+<rect x="524" y="290" width="8" height="34" fill="#151831"/>
+<rect x="500" y="322" width="56" height="8" rx="3" fill="#151831"/>
+<line x1="268" y1="170" x2="514" y2="170" stroke="#5894D5" stroke-width="4" stroke-dasharray="12 10"/>
+<line x1="250" y1="110" x2="520" y2="110" stroke="#5894D5" stroke-width="4"/>
+<line x1="250" y1="96" x2="250" y2="124" stroke="#5894D5" stroke-width="4"/>
+<line x1="520" y1="96" x2="520" y2="124" stroke="#5894D5" stroke-width="4"/>
+<g stroke="#3D4BA7" stroke-width="22" stroke-linecap="round" fill="none">
+<line x1="218" y1="215" x2="207" y2="358"/>
+<line x1="207" y1="360" x2="380" y2="360"/>
+<line x1="380" y1="360" x2="380" y2="522"/>
+<line x1="380" y1="525" x2="428" y2="525"/>
+<line x1="222" y1="238" x2="242" y2="318"/>
+<line x1="242" y1="318" x2="420" y2="318"/>
+</g>
+<circle cx="232" cy="170" r="34" fill="#3D4BA7"/>
+</svg>
+<p class="nr" style="position:absolute; left:438px; top:428px">1</p>
+<p class="nr" style="position:absolute; left:438px; top:240px">2</p>
+<p class="nr" style="position:absolute; left:353px; top:32px">3</p>
+<p class="nr" style="position:absolute; left:568px; top:138px">4</p>
+</div>
+</div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 8</p></div>
+
+</section>
+<section data-einheit="8" id="e8-einseitig">
+<div class="kopf">
+<p class="dach">Einheit 8 · Wissen</p>
+<h2 class="titel">Einseitige Belastungen vermeiden</h2>
+<p class="lead">im Beruf, im Haushalt und im Garten</p>
+</div>
+<div class="reihe r3">
+<div class="karte rein" style="--i:1"><h3>Seiten wechseln</h3><p class="lead">Tragen und Arbeiten mal links, mal rechts</p></div>
+<div class="karte rein" style="--i:2"><h3>Pausen machen</h3><p class="lead">kurz unterbrechen, lockern, dann weiter</p></div>
+<div class="karte rein" style="--i:3"><h3>Aus den Beinen heben</h3><p class="lead">Lasten nah am Körper – genau wie bei der Kniebeuge zum Stuhl</p></div>
+</div>
+<div class="merksatz"><p class="ms">Heute üben wir das Heben vom Boden: aus den Beinen, nah am Körper.</p></div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 8</p></div>
+
+</section>
+<section data-einheit="8" id="e8-einfache-wahl">
+<div class="kopf">
+<p class="dach">Einheit 8 · Umfeld</p>
+<h2 class="titel">Machen Sie Bewegung zur einfachen Wahl</h2>
+</div>
+<div class="reihe r2">
+<div class="karte kompakt rein" style="--i:1"><h3>Fahrrad startklar halten</h3></div>
+<div class="karte kompakt rein" style="--i:2"><h3>Turnschuhe griffbereit</h3></div>
+<div class="karte kompakt rein" style="--i:3"><h3>Fester Übungsplatz zu Hause</h3></div>
+<div class="karte kompakt rein" style="--i:4"><h3>Treppe als Standard</h3></div>
+</div>
+<div class="merksatz"><p class="lead">Jede Übung ohne Gerät geht mit Alltagsgegenständen: Stuhl, Wand, Handtuch, Wasserflasche, Tasche.</p></div>
+<p class="pille">Was ändern Sie bis nächste Woche? Notieren Sie es im Heft.</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 8</p></div>
+
+</section>
+<section data-einheit="8" id="e8-aufgabe" class="aufgabe">
+<div class="kopf">
+<p class="dach">Einheit 8 · Wochenaufgabe</p>
+<h2 class="titel">Bis zur nächsten Woche</h2>
+</div>
+<div class="aufgaben">
+<div class="aufgabe-zeile rein" style="--i:1"><div class="kaestchen"></div><p class="aufgabe-text">Zweimal täglich die Bewegungspause (3 Minuten)</p></div>
+<div class="aufgabe-zeile rein" style="--i:2"><div class="kaestchen"></div><p class="aufgabe-text">Ihre Veränderung umsetzen</p></div>
+<div class="aufgabe-zeile rein" style="--i:3"><div class="kaestchen"></div><p class="aufgabe-text">Einmal das Heimprogramm</p></div>
+<div class="aufgabe-zeile rein" style="--i:4"><div class="kaestchen"></div><p class="aufgabe-text">Eintrag ins Wochenprotokoll</p></div>
+</div>
+<p class="pille">Im Heft: Bewegungspause, Arbeitsplatz-Check</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 8</p></div>
+
+</section>
+<section data-einheit="9" id="e9-titel" class="einheit">
+<p class="riesenzahl">9</p>
+<div class="kopf">
+<p class="dach">Einheit 9 von 10</p>
+<h2 class="titel">Mein Programm für danach</h2>
+<p class="untertitel">Pläne, die halten</p>
+</div>
+<div class="heute">
+<p class="heute-label">Heute</p>
+<ul class="liste">
+<li>Warum gute Vorsätze oft scheitern</li>
+<li>Konkret planen und Hindernisse vorwegnehmen</li>
+<li>Ihr eigenes Programm für die Zeit nach dem Kurs</li>
+</ul>
+</div>
+<p class="pille">Rückblick: Hat Ihre Veränderung aus Einheit 8 geklappt?</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 9</p></div>
+
+</section>
+<section data-einheit="9" id="e9-luecke">
+<div class="kopf">
+<p class="dach">Einheit 9 · Wissen</p>
+<h2 class="titel">Zwischen Absicht und Handlung liegt eine Lücke</h2>
+</div>
+<div class="luecke">
+<div class="karte rein" style="--i:1"><p class="kl">Absicht</p><h3>„Ich sollte mal …“</h3></div>
+<div class="luecke-mitte"><p class="kl">die Lücke</p></div>
+<div class="karte blaukarte rein" style="--i:2"><p class="kl">Handlung</p><h3>„Ich mache es.“</h3></div>
+</div>
+<div class="skala-block">
+<p class="kl">Was die Lücke schließt</p>
+<div class="reihe r3">
+<div class="kachel rein" style="--i:3"><p class="kt">Konkrete Pläne</p></div>
+<div class="kachel rein" style="--i:4"><p class="kt">Wenn-dann-Pläne für Hindernisse</p></div>
+<div class="kachel rein" style="--i:5"><p class="kt">Selbstbeobachtung und kleine Belohnungen</p></div>
+</div>
+</div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 9</p></div>
+
+</section>
+<section data-einheit="9" id="e9-plaene">
+<div class="kopf">
+<p class="dach">Einheit 9 · Planen</p>
+<h2 class="titel">Konkret planen</h2>
+</div>
+<div class="reihe r5">
+<div class="karte frage rein" style="--i:1"><h3>Wann?</h3><p class="lead">dienstags und freitags, 18 Uhr</p></div>
+<div class="karte frage rein" style="--i:2"><h3>Wo?</h3><p class="lead">im Wohnzimmer</p></div>
+<div class="karte frage rein" style="--i:3"><h3>Was?</h3><p class="lead">das Heimprogramm</p></div>
+<div class="karte frage rein" style="--i:4"><h3>Wie lange?</h3><p class="lead">20 Minuten</p></div>
+<div class="karte frage rein" style="--i:5"><h3>Mit wem?</h3><p class="lead">allein oder zu zweit</p></div>
+</div>
+<div class="karte dunkelkarte rein" style="--i:6">
+<p class="kl">Wenn-dann-Plan</p>
+<p class="ms">„Wenn es regnet, dann mache ich das Heimprogramm im Wohnzimmer.“</p>
+</div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 9</p></div>
+
+</section>
+<section data-einheit="9" id="e9-hindernisse" data-frage="1">
+<div class="kopf">
+<p class="dach">Einheit 9 · Frage an Sie</p>
+<h2 class="titel">Was hält Sie am häufigsten vom Training ab?</h2>
+<p class="lead">Für jedes Hindernis eine Gegenstrategie: Wenn …, dann …</p>
+</div>
+<div class="reihe r3">
+<div class="kachel rein" style="--i:1"><h3>Zeitmangel</h3></div>
+<div class="kachel rein" style="--i:2"><h3>Müdigkeit</h3></div>
+<div class="kachel rein" style="--i:3"><h3>Wetter</h3></div>
+<div class="kachel rein" style="--i:4"><h3>Urlaub</h3></div>
+<div class="kachel rein" style="--i:5"><h3>Krankheit</h3></div>
+<div class="kachel rein" style="--i:6"><h3>Unlust</h3></div>
+</div>
+<div class="merksatz"><p class="ms">Was ist Ihr häufigstes Hindernis – und was machen Sie dann?</p></div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 9</p></div>
+
+<p class="frage-zeichen" aria-hidden="true">?</p>
+</section>
+<section data-einheit="9" id="e9-realistisch">
+<div class="kopf">
+<p class="dach">Einheit 9 · Planen</p>
+<h2 class="titel">Realistisch bleiben</h2>
+</div>
+<div class="reihe r2">
+<div class="karte kompakt blaukarte rein" style="--i:1"><p class="kl">Besser</p><h3>2 × 20 Minuten,</h3><p class="lead">die sicher stattfinden …</p></div>
+<div class="karte kompakt rein" style="--i:2"><p class="kl">als</p><h3>4 × 60 Minuten,</h3><p class="lead">die nur geplant sind.</p></div>
+</div>
+<div class="skala-block">
+<p class="kl">Ihre Zielwoche nach dem Kurs</p>
+<div class="reihe r3">
+<div class="kachel rein" style="--i:3"><p class="kt">2 × Krafttraining, ohne oder mit Gerät</p></div>
+<div class="kachel rein" style="--i:4"><p class="kt">150 Minuten Ausdauer, Alltagswege zählen mit</p></div>
+<div class="kachel rein" style="--i:5"><p class="kt">Sitzzeiten immer wieder unterbrechen</p></div>
+</div>
+</div>
+<div class="merksatz"><p class="lead">Rückschläge sind normal. Entscheidend ist, wieder einzusteigen.</p></div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 9</p></div>
+
+</section>
+<section data-einheit="9" id="e9-aufgabe" class="aufgabe">
+<div class="kopf">
+<p class="dach">Einheit 9 · Wochenaufgabe</p>
+<h2 class="titel">Bis zur nächsten Woche</h2>
+</div>
+<div class="aufgaben">
+<div class="aufgabe-zeile rein" style="--i:1"><div class="kaestchen"></div><p class="aufgabe-text">Ihr eigenes Programm nach Ihrem Plan zweimal durchführen</p></div>
+<div class="aufgabe-zeile rein" style="--i:2"><div class="kaestchen"></div><p class="aufgabe-text">Eintrag ins Wochenprotokoll</p></div>
+</div>
+<p class="pille">Im Heft: Planungsbogen „Mein Programm“</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 9</p></div>
+
+</section>
+<section data-einheit="10" id="e10-titel" class="einheit">
+<p class="riesenzahl">10</p>
+<div class="kopf">
+<p class="dach">Einheit 10 von 10</p>
+<h2 class="titel">Weitermachen</h2>
+<p class="untertitel">Abschluss und Ausblick</p>
+</div>
+<div class="heute">
+<p class="heute-label">Heute</p>
+<ul class="liste">
+<li>Was Sie in zehn Wochen gelernt haben</li>
+<li>Ihre Werte im Vergleich zu Einheit 1</li>
+<li>Wie es nach dem Kurs weitergeht</li>
+</ul>
+</div>
+<p class="pille">Rückblick: Wie lief Ihr eigenes Programm?</p>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 10</p></div>
+
+</section>
+<section data-einheit="10" id="e10-rueckblick">
+<div class="kopf">
+<p class="dach">Einheit 10 · Rückblick</p>
+<h2 class="titel">Das können Sie jetzt</h2>
+</div>
+<div class="reihe r2">
+<div class="kachel rein" style="--i:1"><svg class="haken" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.8 2.8L16.2 9"/></svg><p class="kt">Kraft und Ausdauer sicher trainieren – mit und ohne Gerät</p></div>
+<div class="kachel rein" style="--i:2"><svg class="haken" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.8 2.8L16.2 9"/></svg><p class="kt">Ihre Belastung selbst steuern</p></div>
+<div class="kachel rein" style="--i:3"><svg class="haken" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.8 2.8L16.2 9"/></svg><p class="kt">Bewegung in Ihren Alltag einbauen</p></div>
+<div class="kachel rein" style="--i:4"><svg class="haken" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.8 2.8L16.2 9"/></svg><p class="kt">Mit Ihrem eigenen Plan weitermachen</p></div>
+</div>
+<div class="merksatz"><p class="lead">Vergleichen Sie Ihre Werte aus Einheit 1, 6 und 10 im Heft unter „Meine Werte“.</p></div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 10</p></div>
+
+</section>
+<section data-einheit="10" id="e10-weiter">
+<div class="kopf">
+<p class="dach">Einheit 10 · Ausblick</p>
+<h2 class="titel">Wie es weitergeht</h2>
+<p class="lead">Sie entscheiden, was zu Ihnen passt – und können frei kombinieren.</p>
+</div>
+<div class="spalte">
+<div class="nr-zeile rein" style="--i:1"><p class="nr">1</p><p class="nr-text"><b>Ihr Heimprogramm</b> – kostenlos, ohne Geräte, überall</p></div>
+<div class="nr-zeile rein" style="--i:2"><p class="nr">2</p><p class="nr-text"><b>Ausdauer im Alltag</b> – zügig gehen, Rad fahren, Treppen steigen</p></div>
+<div class="nr-zeile rein" style="--i:3"><p class="nr">3</p><p class="nr-text"><b>Sportverein</b> – Gesundheitssport, z. B. mit dem Siegel SPORT PRO GESUNDHEIT</p></div>
+<div class="nr-zeile rein" style="--i:4"><p class="nr">4</p><p class="nr-text"><b>Volkshochschule</b> Böblingen-Sindelfingen – auch mit Kursort Magstadt</p></div>
+<div class="nr-zeile rein" style="--i:5"><p class="nr">5</p><p class="nr-text"><b>Weitere Präventionskurse</b> – über die Kurssuche Ihrer Krankenkasse</p></div>
+<div class="nr-zeile rein" style="--i:6"><p class="nr">6</p><p class="nr-text"><b>Training an Geräten</b> – im Verein oder in einer Gesundheitseinrichtung</p></div>
+</div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 10</p></div>
+
+</section>
+<section data-einheit="10" id="e10-betreuung" data-frage="1">
+<div class="kopf">
+<p class="dach">Einheit 10 · Frage an Sie</p>
+<h2 class="titel">Woran erkennen Sie eine gute Trainingsbetreuung?</h2>
+</div>
+<div class="reihe r2">
+<div class="kachel rein" style="--i:1"><svg class="haken" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9.5 12 4.5l10 5-10 5z"/><path d="M6 11.5v4.5c3.5 2.5 8.5 2.5 12 0v-4.5"/><path d="M22 9.5v6"/></svg><p class="kt">Fachlich ausgebildetes Personal, das vorher nach Ihrer Gesundheit fragt</p></div>
+<div class="kachel rein" style="--i:2"><svg class="haken" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg><p class="kt">Einweisung an jedem Gerät und ein Plan, der zu Ihnen passt</p></div>
+<div class="kachel rein" style="--i:3"><svg class="haken" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9.5L4 20z"/></svg><p class="kt">Während des Trainings ist jemand ansprechbar</p></div>
+<div class="kachel rein" style="--i:4"><svg class="haken" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.8-3.4 8.1-8 9-4.6-.9-8-4.2-8-9V6z"/><path d="M8.5 12.2l2.4 2.4 4.6-5"/></svg><p class="kt">Niemand drängt Sie zu Produkten oder Präparaten</p></div>
+</div>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 10</p></div>
+
+<p class="frage-zeichen" aria-hidden="true">?</p>
+</section>
+<section data-einheit="10" id="e10-danke" class="einheit">
+<img class="danke-logo" src="../bilder/logo-negativ-weiss.svg" alt="Logo Bewegungszentrum für Körperwohl und Squash">
+<div class="kopf">
+<p class="dach">Einheit 10 · Abschluss</p>
+<h2 class="titel">Danke fürs Mitmachen!</h2>
+</div>
+<ul class="liste">
+<li>Ihre Teilnahmebescheinigung reichen Sie selbst bei Ihrer Krankenkasse ein. Einen Zuschuss gibt es meist ab 8 von 10 Terminen.</li>
+<li>Bitte füllen Sie den Rückmeldebogen aus.</li>
+<li>In etwa acht Wochen fragen wir nach, wie es Ihnen mit dem Weitermachen geht. Die Teilnahme ist freiwillig.</li>
+</ul>
+<div class="fuss"><p>Gesundheitstraining an Geräten</p><p>Einheit 10</p></div>
+
+</section>
+<div id="leiste"><button class="l-start">Übersicht</button><button class="l-zurueck">‹</button><span class="stand"></span><button class="l-weiter">›</button></div>
+<div id="hinweis"></div>
+<div id="tasten"></div>
+</div>
+<script>
+
+(function () {
+  var rahmen = document.getElementById('rahmen');
+  var start = document.getElementById('start');
+  var alle = Array.prototype.slice.call(rahmen.querySelectorAll('section[data-einheit]'));
+  var leiste = document.getElementById('leiste');
+  var standEl = leiste.querySelector('.stand');
+  var hinweis = document.getElementById('hinweis');
+  var tastenEl = document.getElementById('tasten');
+  var zeigeTasten = /[?&]tasten=1/.test(location.search);
+  var aktuell = null;      // aktive Folie (section) oder null = Startseite
+  var richtung = null;     // 'vor' bei Weiterklicken, sonst Rueckweg
+  var hinweisUhr = null;
+
+  function skalieren() {
+    var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    rahmen.style.transform = 'scale(' + s + ') translate(-960px, -540px)';
+  }
+  window.addEventListener('resize', skalieren);
+  skalieren();
+
+  function folienDerEinheit(nr) {
+    return alle.filter(function (f) { return f.getAttribute('data-einheit') === nr; });
+  }
+
+  function zeigeHinweis(text) {
+    hinweis.textContent = text;
+    hinweis.style.display = 'block';
+    clearTimeout(hinweisUhr);
+    hinweisUhr = setTimeout(function () { hinweis.style.display = 'none'; }, 3500);
+  }
+
+  function idAusAdresse() { return decodeURIComponent(location.hash.replace(/^#/, '')); }
+
+  function anzeigen(id) {
+    if (typeof id !== 'string') id = idAusAdresse();
+    var folie = id ? document.getElementById(id) : null;
+    if (folie && !folie.hasAttribute('data-einheit')) folie = null;
+    if (aktuell) aktuell.classList.remove('aktiv');
+    start.classList.remove('aktiv');
+    hinweis.style.display = 'none';
+    if (!folie) {
+      aktuell = null;
+      start.classList.add('aktiv');
+      leiste.style.display = 'none';
+      var erste = start.querySelector('.kachel-e');
+      if (erste) erste.focus();
+      richtung = null;
+      return;
+    }
+    aktuell = folie;
+    if (folie.hasAttribute('data-frage')) {
+      var verdeckt = richtung === 'vor';
+      folie.classList.toggle('verdeckt', verdeckt);
+      folie.classList.remove('aufgedeckt');
+    }
+    folie.classList.add('aktiv');
+    var liste = folienDerEinheit(folie.getAttribute('data-einheit'));
+    standEl.textContent = 'Einheit ' + folie.getAttribute('data-einheit') + ' · ' + (liste.indexOf(folie) + 1) + '/' + liste.length;
+    leiste.style.display = 'flex';
+    richtung = null;
+  }
+
+  // Sofort umschalten und die Adresse nur nachfuehren. So zaehlt jeder Tastendruck, auch schnell
+  // hintereinander, und die Zurueck-Taste der Fernbedienung geht ueber den Verlauf eine Folie zurueck.
+  function gehe(id, r) {
+    richtung = r;
+    var adresse = id ? '#' + id : location.pathname + location.search;
+    if (idAusAdresse() !== id) {
+      try { history.pushState(null, '', adresse); } catch (x) { location.hash = id; return; }
+    }
+    anzeigen(id);
+  }
+
+  function weiter() {
+    if (!aktuell) return;
+    if (aktuell.classList.contains('verdeckt')) {
+      aktuell.classList.remove('verdeckt');
+      aktuell.classList.add('aufgedeckt');
+      return;
+    }
+    var liste = folienDerEinheit(aktuell.getAttribute('data-einheit'));
+    var i = liste.indexOf(aktuell);
+    if (i < liste.length - 1) gehe(liste[i + 1].id, 'vor');
+    else zeigeHinweis('Das war die letzte Folie dieser Einheit. Zur Übersicht: Knopf „Übersicht“ unten.');
+  }
+
+  function zurueck() {
+    if (!aktuell) return;
+    // Frage gerade aufgeloest: erst wieder verdecken (falls zu frueh geklickt)
+    if (aktuell.classList.contains('aufgedeckt')) {
+      aktuell.classList.remove('aufgedeckt');
+      aktuell.classList.add('verdeckt');
+      return;
+    }
+    var liste = folienDerEinheit(aktuell.getAttribute('data-einheit'));
+    var i = liste.indexOf(aktuell);
+    if (i > 0) gehe(liste[i - 1].id, 'zurueck');
+    else gehe('', 'zurueck');
+  }
+
+  function uebersicht() { gehe('', null); }
+
+  window.addEventListener('popstate', function () { richtung = null; anzeigen(); });
+  window.addEventListener('hashchange', function () { if (idAusAdresse() !== (aktuell ? aktuell.id : '')) { richtung = null; anzeigen(); } });
+
+  document.addEventListener('keydown', function (e) {
+    var k = e.key || '';
+    if (zeigeTasten) {
+      tastenEl.textContent = 'Taste: ' + k + ' (' + (e.keyCode || '') + ')';
+      tastenEl.style.display = 'block';
+    }
+    if (!aktuell) return; // Startseite: Pfeile und Auswahl bewegen den Fokus auf die Kacheln
+    var vor = ['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Spacebar', 'Enter', 'MediaFastForward', 'MediaTrackNext', 'MediaPlayPause', 'MediaPlay'];
+    var rueck = ['ArrowLeft', 'ArrowUp', 'PageUp', 'MediaRewind', 'MediaTrackPrevious'];
+    if (vor.indexOf(k) >= 0 || e.keyCode === 179 || e.keyCode === 228 || e.keyCode === 34) { e.preventDefault(); weiter(); }
+    else if (rueck.indexOf(k) >= 0 || e.keyCode === 227 || e.keyCode === 33) { e.preventDefault(); zurueck(); }
+    else if (k === 'Home' || k === 'Escape') { e.preventDefault(); uebersicht(); }
+  });
+
+  rahmen.addEventListener('click', function (e) {
+    if (!aktuell) return;
+    if (e.target.closest && e.target.closest('#leiste')) return;
+    weiter();
+  });
+  rahmen.addEventListener('contextmenu', function (e) { if (aktuell) { e.preventDefault(); zurueck(); } });
+
+  leiste.querySelector('.l-start').addEventListener('click', function (e) { e.stopPropagation(); uebersicht(); });
+  leiste.querySelector('.l-zurueck').addEventListener('click', function (e) { e.stopPropagation(); zurueck(); });
+  leiste.querySelector('.l-weiter').addEventListener('click', function (e) { e.stopPropagation(); weiter(); });
+
+  Array.prototype.forEach.call(start.querySelectorAll('.kachel-e'), function (k) {
+    k.addEventListener('click', function (e) { e.stopPropagation(); gehe(k.getAttribute('data-ziel'), 'vor'); });
+  });
+  document.getElementById('vollbild').addEventListener('click', function (e) {
+    e.stopPropagation();
+    var el = document.documentElement;
+    var f = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (f) { try { f.call(el); } catch (x) {} }
+  });
+
+  // Bildschirmschoner moeglichst verhindern, solange die Seite offen ist
+  function wachHalten() {
+    try { if (navigator.wakeLock) navigator.wakeLock.request('screen').catch(function () {}); } catch (x) {}
+  }
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) wachHalten(); });
+  wachHalten();
+
+  anzeigen();
+})();
+
+</script>
+</body>
+</html>
